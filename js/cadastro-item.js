@@ -326,6 +326,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const descricaoItem = document
         .getElementById("descricaoItem")
         .value.trim();
+
+      const quantidade = parseInt(
+        document.getElementById("quantidadeItem").value
+      );
+
       const categoria = document.getElementById("categoriaItem").value;
 
       const fotosInput = document.getElementById("fotosItem");
@@ -336,6 +341,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const dias = parseInt(document.getElementById("duracaoOferta").value);
       const duracao = dias === 1 ? "1 Dia" : `${dias} Dias`;
+
+      // Verificar qual opção de endereço foi escolhida
+      const usarOutro = document.getElementById("usarOutroEndereco").checked;
+      let enderecoFinal = {};
+
+      if (usarOutro) {
+        // Endereço digitado manualmente
+        enderecoFinal = {
+          cep: document.getElementById("cep").value.trim(),
+          rua: document.getElementById("rua").value.trim(),
+          bairro: document.getElementById("bairro").value.trim(),
+          numero: document.getElementById("numero").value.trim(),
+          cidade: document.getElementById("cidade").value.trim(),
+          estado: document.getElementById("estado").value.trim(),
+        };
+
+        // Verifica se todos os campos foram preenchidos
+        const enderecoIncompleto = Object.values(enderecoFinal).some((v) => !v);
+        if (enderecoIncompleto) {
+          alert("Por favor, preencha todos os campos de endereço.");
+          return;
+        }
+
+        // Salva no perfil, se ainda estiver vazio
+        const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
+        const perfil = perfis[usuario.email] || {};
+        const campos = ["cep", "rua", "bairro", "numero", "cidade", "estado"];
+        const enderecoDoPerfilVazio = campos.every((campo) => !perfil[campo]);
+
+        if (enderecoDoPerfilVazio) {
+          campos.forEach((campo) => {
+            perfil[campo] = enderecoFinal[campo];
+          });
+
+          perfis[usuario.email] = perfil;
+          localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
+        }
+      } else {
+        // Endereço do perfil
+        const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
+        const perfil = perfis[usuario.email] || {};
+
+        enderecoFinal = {
+          cep: perfil.cep || "",
+          rua: perfil.rua || "",
+          bairro: perfil.bairro || "",
+          numero: perfil.numero || "",
+          cidade: perfil.cidade || "",
+          estado: perfil.estado || "",
+        };
+
+        // Valida se o endereço do perfil está completo
+        const incompleto = Object.values(enderecoFinal).some((v) => !v);
+        if (incompleto) {
+          alert(
+            "Seu perfil não tem um endereço cadastrado. Por favor, preencha manualmente."
+          );
+          return;
+        }
+      }
 
       // Converter fotos em base64
       const converterBase64 = (file) => {
@@ -353,11 +418,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = {
         nome: nomeItem,
         descricao: descricaoItem,
+        quantidade,
         categoria,
         duracao,
         fotos: fotosFinal,
         dataCadastro: new Date().toISOString(),
         criador: nomeCriador,
+        endereco: enderecoFinal,
       };
 
       // Buscar itens existentes e salvar o novo
@@ -466,6 +533,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const botao = document.querySelector(".btn-cadastro");
     if (titulo) titulo.textContent = "Editar Item";
     if (botao) botao.textContent = "Salvar Alterações";
+  }
+
+  // #####################################################
+  //  Adiciona o campo de endereço para entrega.
+  // #####################################################
+
+  const campoEnderecoCustomizado = document.getElementById(
+    "campoEnderecoPersonalizado"
+  );
+  const radioPerfil = document.getElementById("usarEnderecoPerfil");
+  const radioOutro = document.getElementById("usarOutroEndereco");
+
+  if (radioPerfil && radioOutro && campoEnderecoCustomizado) {
+    radioPerfil.addEventListener("change", () => {
+      campoEnderecoCustomizado.classList.add("hidden");
+    });
+    radioOutro.addEventListener("change", () => {
+      campoEnderecoCustomizado.classList.remove("hidden");
+    });
   }
 });
 
@@ -580,3 +666,22 @@ function sair() {
 function acessarPerfil() {
   window.location.href = "perfil.html";
 }
+
+document.getElementById("cep")?.addEventListener("blur", async () => {
+  const cep = document.getElementById("cep").value.replace(/\D/g, "");
+  if (cep.length !== 8) return;
+
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await response.json();
+
+    if (!data.erro) {
+      document.getElementById("rua").value = data.logradouro || "";
+      document.getElementById("bairro").value = data.bairro || "";
+      document.getElementById("cidade").value = data.localidade || "";
+      document.getElementById("estado").value = data.uf || "";
+    }
+  } catch (err) {
+    console.error("Erro ao buscar CEP:", err);
+  }
+});
