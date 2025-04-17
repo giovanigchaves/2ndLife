@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2ndLife - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+
+<body class="body-dashboard">
+    <header class="topo">
+        <div class="topo-container">
+            <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
+            <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
+            <nav class="topo-nav">
+                <a href="dashboard.html" class="ativo">Dashboard</a>
+                <a href="#" onclick="abrirCadastroNovo()">Cadastrar Item</a>
+                <a href="itens-cadastrados.html">Itens Cadastrados</a>
+                <a href="#" onclick="sair()">Sair</a>
+            </nav>
+            <div class="perfil-miniatura" onclick="window.location.href='perfil.html'">
+                <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
+                <span id="nomeMiniatura"></span>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="logo-img" />
+        <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
+
+        <h2 id="boasVindas"></h2>
+
+        <button class="btn-cadastro" onclick="CadastrarItem()">Cadastrar Item</button>
+        <button class="btn-cadastro" onclick="verItensCadastrados()">Ver Itens Cadastrados</button>
+
+        <button class="btn-cadastro" onclick="sair()">Sair</button>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

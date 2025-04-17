@@ -1,0 +1,92 @@
+.body-cadastro-usuario {
+  margin: auto;
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(to right, #f4f4f4, #d6ded6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.container {
+  text-align: center;
+  padding: 30px;
+  background-color: #f6f2f1;
+  border-radius: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 400px;
+}
+.logo-img {
+  width: 120px;
+}
+.container h2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 36px;
+  color: #34a27b;
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+.container form input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-sizing: border-box;
+  transition: border 0.2s ease-in-out;
+}
+.mensagem-senha {
+  display: block;
+  margin-top: -5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.msn-senha{
+  position: absolute;
+}
+.msn-cadastro{
+position: absolute;
+margin: -6px 0 0 0;
+font-size: 14px;
+font-weight: bold;
+}
+
+.ok {
+  color: green;
+}
+
+.erro {
+  color: red;
+}
+input.input-ok {
+  border: 2px solid green !important;
+  outline: none;
+}
+
+input.input-erro {
+  border: 2px solid red !important;
+  outline: none;
+}
+span.mensagem-login {
+  float: left;
+  margin: 10px 0 0 50px;
+}
+.btn-cadastro {
+  background-color: #2b7a78;
+  color: white;
+  width: 100%;
+  padding: 12px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-cadastro:hover {
+  background-color: #255755;
+}

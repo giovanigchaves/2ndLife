@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Item</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/cadastro-item.css" />
+</head>
+
+<body class="body-cadastro-item">
+    <header class="topo">
+        <div class="topo-container">
+            <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
+            <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
+            <nav class="topo-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#"class="ativo">Cadastrar Item</a>
+                <a href="itens-cadastrados.html">Itens Cadastrados</a>
+                <a href="#" onclick="sair()">Sair</a>
+            </nav>
+            
+            <div class="perfil-miniatura" onclick="acessarPerfil()">
+                <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
+                <span id="nomeMiniatura"></span>
+            </div>
+
+        </div>
+    </header>
+
+    <div class="container cadastro-item position">
+        <a href="dashboard.html" class="btn-fechar">x</a>
+        <h1 class="logo">Cadastrar Item</h1>
+
+        <form id="formCadastroItem">
+            <!-- Nome do item -->
+            <label for="nomeItem">Nome do item:</label>
+            <input type="text" id="nomeItem" name="nomeItem" required />
+
+            <!-- Descrição -->
+            <label for="descricaoItem">Descrição:</label>
+            <textarea id="descricaoItem" name="descricaoItem" rows="4" required></textarea>
+
+            <!-- Fotos -->
+            <label for="fotos">Fotos do item:</label>
+            <input id="fotosItem" type="file" name="fotos" accept="image/*" multiple required />
+            <!-- Visualização das fotos no modo edição -->
+            <div id="previewFotosEdicao" class="preview-fotos-edicao"></div>
+
+
+            <!-- Categoria + botão adicionar -->
+            <div class="form-group">
+                <label for="categoriaItem">Categoria:</label>
+                <div class="input-group">
+                    <select id="categoriaItem" name="categoriaItem" required>
+                        <option value="">Selecione</option>
+                    </select>
+                    <button type="button" id="btnAddCategoria" class="btn-add-categoria">+</button>
+                </div>
+            </div>
+            <!-- Duração da oferta -->
+            <label for="duracaoOferta">Duração da oferta:</label>
+            <select id="duracaoOferta" name="duracaoOferta" required>
+                <option value="">Selecione</option>
+                <option value="1">24 Horas </option>
+                <option value="7">1 Semana</option>
+                <option value="15">15 Dias</option>
+                <option value="30">1 Mês</option>
+            </select>
+
+            <button type="submit" class="btn-cadastro">Cadastrar Item</button>
+        </form>
+        <!-- modal categoria -->
+        <div id="modalCategoria" class="modal hidden">
+            <div class="modal-content">
+                <span class="btn-fechar" id="fecharModalCategoria">×</span>
+                <h2>Nova Categoria</h2>
+                <input type="text" id="novaCategoria" placeholder="Nome da categoria" />
+                <button id="salvarCategoria" class="btn-cadastro">Salvar Categoria</button>
+                <button id="btnGerenciarCategorias" class="btn-gerenciar">Gerenciar Categorias</button>
+            </div>
+        </div>
+        <!-- modal editar / apagar categoria -->
+        <div id="modalGerenciar" class="modal hidden">
+            <div class="modal-content">
+                <span class="btn-fechar" id="fecharGerenciarModal">×</span>
+                <h2>Gerenciar Categorias</h2>
+
+                <select id="listaCategorias"></select>
+                <p id="mensagemCategoria" class="mensagem-categoria"></p>
+
+
+                <div>
+                    <button id="editarCategoria" class="btn-editar">Editar</button>
+                    <button id="apagarCategoria" class="btn-apagar">Apagar</button>
+                </div>
+
+                <div id="editarBox" class="hidden editar-box">
+                    <input type="text" id="novoNomeCategoria" placeholder="Novo nome da categoria" />
+                    <button id="confirmarEdicao" class="btn-cadastro">Confirmar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Modal de confirmação -->
+    <div class="modal modal-confirmacao hidden">
+        <div class="modal-content">
+            <p>Item cadastrado com sucesso!</p>
+        </div>
+    </div>
+    <!-- Modal reutilizável para mensagens -->
+    <div class="modal-acao modal-confirmacao hidden">
+        <div class="modal-acao-content">
+            <p></p> <!-- Mensagem será inserida via JS -->
+        </div>
+    </div>
+
+
+    <script defer src="js/cadastro-item.js"></script>
+</body>
+
+</html>
