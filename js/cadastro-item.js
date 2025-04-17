@@ -15,6 +15,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // obtém os dados do perfil do usuario
   const perfil = perfis[usuario.email];
 
+  // Preenche automaticamente os campos de endereço se já tiver salvo
+  if (
+    perfil.cep &&
+    perfil.rua &&
+    perfil.numero &&
+    perfil.bairro &&
+    perfil.cidade &&
+    perfil.estado
+  ) {
+    document.getElementById("cep").value = perfil.cep;
+    document.getElementById("rua").value = perfil.rua;
+    document.getElementById("numero").value = perfil.numero;
+    document.getElementById("bairro").value = perfil.bairro;
+    document.getElementById("cidade").value = perfil.cidade;
+    document.getElementById("estado").value = perfil.estado;
+  }
+
   // obtém o elemento foto e nome do perfil no html
   const foto = document.getElementById("fotoMiniatura");
   const nome = document.getElementById("nomeMiniatura");
@@ -342,64 +359,34 @@ document.addEventListener("DOMContentLoaded", () => {
       const dias = parseInt(document.getElementById("duracaoOferta").value);
       const duracao = dias === 1 ? "1 Dia" : `${dias} Dias`;
 
-      // Verificar qual opção de endereço foi escolhida
-      const usarOutro = document.getElementById("usarOutroEndereco").checked;
-      let enderecoFinal = {};
+      // Endereço sempre manual
+      const enderecoFinal = {
+        cep: document.getElementById("cep").value.trim(),
+        rua: document.getElementById("rua").value.trim(),
+        bairro: document.getElementById("bairro").value.trim(),
+        numero: document.getElementById("numero").value.trim(),
+        cidade: document.getElementById("cidade").value.trim(),
+        estado: document.getElementById("estado").value.trim(),
+      };
 
-      if (usarOutro) {
-        // Endereço digitado manualmente
-        enderecoFinal = {
-          cep: document.getElementById("cep").value.trim(),
-          rua: document.getElementById("rua").value.trim(),
-          bairro: document.getElementById("bairro").value.trim(),
-          numero: document.getElementById("numero").value.trim(),
-          cidade: document.getElementById("cidade").value.trim(),
-          estado: document.getElementById("estado").value.trim(),
-        };
+      // Validação dos campos
+      const enderecoIncompleto = Object.values(enderecoFinal).some((v) => !v);
+      if (enderecoIncompleto) {
+        const modalConfirmacao = document.querySelector(
+          ".modal-acao.modal-confirmacao"
+        );
+        const textoModal = modalConfirmacao.querySelector("p");
+        textoModal.textContent =
+          "Por favor, preencha todos os campos de endereço.";
+        modalConfirmacao.classList.remove("hidden");
+        modalConfirmacao.classList.add("show");
 
-        // Verifica se todos os campos foram preenchidos
-        const enderecoIncompleto = Object.values(enderecoFinal).some((v) => !v);
-        if (enderecoIncompleto) {
-          alert("Por favor, preencha todos os campos de endereço.");
-          return;
-        }
+        setTimeout(() => {
+          modalConfirmacao.classList.remove("show");
+          modalConfirmacao.classList.add("hidden");
+        }, 2000);
 
-        // Salva no perfil, se ainda estiver vazio
-        const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-        const perfil = perfis[usuario.email] || {};
-        const campos = ["cep", "rua", "bairro", "numero", "cidade", "estado"];
-        const enderecoDoPerfilVazio = campos.every((campo) => !perfil[campo]);
-
-        if (enderecoDoPerfilVazio) {
-          campos.forEach((campo) => {
-            perfil[campo] = enderecoFinal[campo];
-          });
-
-          perfis[usuario.email] = perfil;
-          localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
-        }
-      } else {
-        // Endereço do perfil
-        const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-        const perfil = perfis[usuario.email] || {};
-
-        enderecoFinal = {
-          cep: perfil.cep || "",
-          rua: perfil.rua || "",
-          bairro: perfil.bairro || "",
-          numero: perfil.numero || "",
-          cidade: perfil.cidade || "",
-          estado: perfil.estado || "",
-        };
-
-        // Valida se o endereço do perfil está completo
-        const incompleto = Object.values(enderecoFinal).some((v) => !v);
-        if (incompleto) {
-          alert(
-            "Seu perfil não tem um endereço cadastrado. Por favor, preencha manualmente."
-          );
-          return;
-        }
+        return;
       }
 
       // Converter fotos em base64
@@ -533,25 +520,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const botao = document.querySelector(".btn-cadastro");
     if (titulo) titulo.textContent = "Editar Item";
     if (botao) botao.textContent = "Salvar Alterações";
-  }
-
-  // #####################################################
-  //  Adiciona o campo de endereço para entrega.
-  // #####################################################
-
-  const campoEnderecoCustomizado = document.getElementById(
-    "campoEnderecoPersonalizado"
-  );
-  const radioPerfil = document.getElementById("usarEnderecoPerfil");
-  const radioOutro = document.getElementById("usarOutroEndereco");
-
-  if (radioPerfil && radioOutro && campoEnderecoCustomizado) {
-    radioPerfil.addEventListener("change", () => {
-      campoEnderecoCustomizado.classList.add("hidden");
-    });
-    radioOutro.addEventListener("change", () => {
-      campoEnderecoCustomizado.classList.remove("hidden");
-    });
   }
 });
 
