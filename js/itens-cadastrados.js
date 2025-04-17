@@ -361,33 +361,38 @@ function aplicarFiltrosEBusca() {
   exibirItensFiltrados(itens);
 }
 
-// ############################################
-// ############################################
-// continuar daqui...
-// ############################################
-// ############################################
-
-function abrirCadastroNovo() {
-  sessionStorage.removeItem("itemEmEdicao");
-  window.location.href = "cadastro-item.html";
-}
-
+//renderiza os iten filtrados na tela.
 function exibirItensFiltrados(itens) {
   const container = document.getElementById("listaItens");
   container.innerHTML =
     itens.length === 0 ? "<p>Nenhum item encontrado.</p>" : "";
 
   itens.forEach((item) => renderizarItem(item, container));
-  configurarEventosVerMais(); // Reutiliza a mesma função
+  configurarEventosVerMais();
 }
 
+// ao clicar no botao Cadastrar Item, direciona para pagina de cadastro.
+function abrirCadastroNovo() {
+  sessionStorage.removeItem("itemEmEdicao");
+  window.location.href = "cadastro-item.html";
+}
+
+// fecha modal detalhes do item quando clicado no X.
 function fecharModal() {
   const modal = document.getElementById("modalItem");
   modal.classList.add("hidden");
 }
+
+// ao clicar no botao sair desloga e direciona para a pagina de login.
 function sair() {
   sessionStorage.removeItem("usuarioLogado");
   window.location.href = "login.html";
+}
+
+// fecha a modal que visualiza a imagem.
+function fecharVisualizadorImagem() {
+  const visualizador = document.getElementById("visualizadorImagem");
+  visualizador.classList.add("hidden");
 }
 
 // EXPORTAR BACKUP com escolha de local
@@ -401,7 +406,7 @@ document
 
     const jsonString = JSON.stringify(dados, null, 2);
 
-    // Verifica suporte à API
+    // Verifica suporte à API (salvar como)
     if (window.showSaveFilePicker) {
       try {
         const options = {
@@ -427,7 +432,7 @@ document
         }
       }
     } else {
-      // Fallback: download automático
+      // Fallback: download automático (navegadores antigos)
       const blob = new Blob([jsonString], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -462,7 +467,7 @@ document
           JSON.stringify(dados.categorias || [])
         );
 
-        // Exibe a nova modal ao invés de alert
+        // exibe modal de confirmaçao.
         const modalConfirmacao = document.querySelector(
           ".modal-acao.modal-confirmacao"
         );
@@ -482,22 +487,3 @@ document
     };
     reader.readAsText(file);
   });
-
-// excluir item
-document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("btn-excluir")) {
-    const index = e.target.dataset.index;
-    const itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
-
-    if (confirm("Tem certeza que deseja excluir este item?")) {
-      itens.splice(index, 1);
-      localStorage.setItem("itensCadastrados", JSON.stringify(itens));
-      carregarItensLista();
-    }
-  }
-});
-
-function fecharVisualizadorImagem() {
-  const visualizador = document.getElementById("visualizadorImagem");
-  visualizador.classList.add("hidden");
-}
