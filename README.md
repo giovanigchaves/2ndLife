@@ -13,6 +13,11 @@ Este projeto foi desenvolvido através do programa de formação **Movitalent**,
 O objetivo é capacitar talentos para criarem soluções reais com tecnologias modernas e boas práticas.
 
 ---
+
+ ***Asse o projeto no GitHub Pages***  **[GuitHub Pages/](https://giovanigchaves.github.io/2ndLife/)**.
+
+
+---
    
 <img src="https://github.com/user-attachments/assets/729e147e-96f0-4418-b9b5-8b3b9f7198ce" width="100px" height="100px" alt="2ndLife">
 
