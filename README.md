@@ -8,13 +8,14 @@
 
 ## 🏠 Sobre o Projeto
 
-Este projeto foi desenvolvido através do programa de formação **Movitalent**, uma iniciativa da empresa [**Moviplu**](https://www.moviplu.com/).
+Este projeto foi desenvolvido através do programa de formação **Movitalent**, uma iniciativa da empresa <a href="https://www.moviplu.com/" target="_blank">Muviplu</a>
 
 O objetivo é capacitar talentos para criarem soluções reais com tecnologias modernas e boas práticas.
 
 ---
 
- ***Asse o projeto no GitHub Pages***  **[GuitHub Pages/](https://giovanigchaves.github.io/2ndLife/)**.
+ ***Asse o projeto no GitHub Pages***  **<a href="https://giovanigchaves.github.io/2ndLife/" target="_blank">GitHub Pages</a>**.
+
 
 
 ---
