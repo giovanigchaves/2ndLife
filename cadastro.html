@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2ndLife - Cadastro</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/cadastro.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="body-cadastro-usuario">
+    <div class="container">
+        <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="logo-img" />
+        <h2>Criar Conta</h2>
+        <form onsubmit="return cadastrarUsuario()" action="#">
+            <input type="text" id="nomeCadastro" placeholder="Nome completo" required />
+            <input type="email" id="emailCadastro" placeholder="E-mail" required />
+            <input type="password" id="senhaCadastro" placeholder="Senha" required />
+            <input type="password" id="senhaConfirmacao" placeholder="Confirmar senha" required
+                oninput="validarSenhas()" />
+
+            <div class="mensagens-feedback">
+                <span id="mensagemSenha" class="mensagem"></span>
+                <span id="mensagemCadastro" class="mensagem"></span>
+            </div>
+
+            <button type="submit" class="btn btn-vd ">Cadastrar</button>
+        </form>
+        <p>Já tem uma conta? <a href="login.html">Entrar</a></p>
+    </div>
+
+    <script src="js/cadastro.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+.body-cadastro-usuario {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.container {
+  max-width: 400px;
+}
+
+.logo-img {
+  width: 120px;
+  margin: 0 auto;
+}
+.container h2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 2rem;
+  color: #34a27b;
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+.container p {
+  margin-top: 15px;
+}
+.container a {
+  color: #2b7a78;
+  text-decoration: none;
+}
+.container a:hover{
+  text-decoration: underline;
+}
+.mensagem {
+  display: block;
+  margin-top: -5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.mensagens-feedback {
+  position: absolute;
+}
+
+.msn-cadastro{
+position: absolute;
+margin: -6px 0 0 0;
+font-size: 14px;
+font-weight: bold;
+}
+
+.mensagem.ok {
+  color: #27ae60;
+}
+
+.mensagem.erro {
+  color: #c0392b;
+}
+
+input.input-ok {
+  border: 2px solid green !important;
+  outline: none;
+}
+
+input.input-erro {
+  border: 2px solid red !important;
+  outline: none;
+}
+span.mensagem-login {
+  float: left;
+  margin: 10px 0 0 50px;
+}
+
+.btn{
+  margin-top: 15px;
+}

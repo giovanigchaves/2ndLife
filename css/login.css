@@ -1,0 +1,59 @@
+.body-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  width: 450px;
+}
+
+.logo-img {
+  width: 150px;
+  margin: 0 auto;
+}
+
+.slogan {
+  font-size: 1rem;
+}
+
+.logo-login {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.btn-entrar-login {
+  margin-bottom: 10px;
+}
+
+.mensagem-login {
+  color: #c0392b;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+.mensagem-login.ok {
+  color: #27ae60;
+}
+
+.mensagem-login.erro {
+  color: #c0392b;
+}
+
+.account-login {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 20px;
+}
+
+.account-login a {
+  color: #2b7a78;
+  text-decoration: none;
+}
+
+.account-login a:hover {
+  text-decoration: underline;
+}

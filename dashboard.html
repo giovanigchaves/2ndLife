@@ -1,0 +1,61 @@
+<!-- DASHBOARD MODERNA - 2ndLife -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | 2ndLife</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="xxxxx" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+</head>
+
+<body class="body-dashboard">
+    <header class="topo">
+
+        <div class="topo-container">
+            <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
+            <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
+
+            <nav class="topo-nav" id="topoNav">
+                <a href="#" id="menuLink" onclick="toggleMenu()">Menu</a>
+                <div class="menu-links">
+                  <a class="ativo" href="dashboard.html">Dashboard</a>
+                  <a href="#" onclick="abrirCadastroNovo()">Cadastrar Item</a>
+                  <a href="itens-cadastrados.html">Itens Cadastrados</a>
+                  <a href="#" onclick="sair()">Sair</a>
+                </div>
+              </nav>
+              
+            <div class="perfil-miniatura" onclick="acessarPerfil()">
+                <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
+                <span id="nomeMiniatura"></span>
+            </div>
+        </div>
+
+
+    </header>
+
+    <main class="container">
+        <h2 id="boasVindas">Olá!</h2>
+
+        <div class="dashboard-colunas">
+            <div class="coluna-dashboard">
+                <h3>📦 Meus Itens</h3>
+                <div id="meusItens"></div>
+            </div>
+            <div class="coluna-dashboard">
+                <h3>💰 Minhas Ofertas</h3>
+                <div id="minhasOfertas"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js" defer></script>
+</body>
+
+</html>
