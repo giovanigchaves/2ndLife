@@ -21,6 +21,23 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarResponsividadeBackup();
 
   // Eventos para os links de backup no menu superior (responsivo)
+  // BOTÕES GRANDES (visíveis no desktop)
+  document
+    .getElementById("btnExportarBackup")
+    ?.addEventListener("click", exportarBackup);
+
+  document
+    .getElementById("btnImportarBackup")
+    ?.addEventListener("click", () => {
+      document.getElementById("inputImportarBackup").click();
+    });
+
+  // INPUT HIDDEN que será acionado por qualquer botão ou link
+  document
+    .getElementById("inputImportarBackup")
+    ?.addEventListener("change", importarBackup);
+
+  // LINKS DE MENU (visíveis em telas menores)
   document
     .getElementById("linkExportarBackup")
     ?.addEventListener("click", (e) => {
@@ -33,21 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ?.addEventListener("click", (e) => {
       e.preventDefault();
       document.getElementById("inputImportarBackup").click();
-    });
-
-  // Eventos para os links do menu responsivo
-  document
-    .getElementById("linkExportarBackup")
-    ?.addEventListener("click", (e) => {
-      e.preventDefault();
-      exportarBackup(); // chama a mesma função do botão
-    });
-
-  document
-    .getElementById("linkImportarBackup")
-    ?.addEventListener("click", (e) => {
-      e.preventDefault();
-      document.getElementById("inputImportarBackup").click(); // simula clique no input oculto
     });
 });
 
@@ -260,9 +262,38 @@ async function exportarBackup() {
   };
 
   const jsonString = JSON.stringify(dados, null, 2);
-
-  // Exportação sempre usando método compatível com todos os navegadores
   const blob = new Blob([jsonString], { type: "application/json" });
+
+  // Tenta usar a API moderna se suportada
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "backup-2ndlife.json",
+        types: [
+          {
+            description: "Arquivo JSON",
+            accept: { "application/json": [".json"] },
+          },
+        ],
+      });
+
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+
+      alert("Backup exportado com sucesso!");
+      return;
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        alert("Erro ao exportar o backup.");
+        console.error(err);
+      }
+      // Se o usuário cancelar, faz nada
+      return;
+    }
+  }
+
+  // Fallback para navegadores que não suportam showSaveFilePicker
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
