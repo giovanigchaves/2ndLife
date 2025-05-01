@@ -34,6 +34,21 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       document.getElementById("inputImportarBackup").click();
     });
+
+  // Eventos para os links do menu responsivo
+  document
+    .getElementById("linkExportarBackup")
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
+      exportarBackup(); // chama a mesma função do botão
+    });
+
+  document
+    .getElementById("linkImportarBackup")
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("inputImportarBackup").click(); // simula clique no input oculto
+    });
 });
 
 // =============================================
@@ -246,40 +261,15 @@ async function exportarBackup() {
 
   const jsonString = JSON.stringify(dados, null, 2);
 
-  if (window.showSaveFilePicker) {
-    try {
-      const options = {
-        suggestedName: "backup-2ndlife.json",
-        types: [
-          {
-            description: "Arquivo JSON",
-            accept: { "application/json": [".json"] },
-          },
-        ],
-      };
-
-      const handle = await window.showSaveFilePicker(options);
-      const writable = await handle.createWritable();
-      await writable.write(jsonString);
-      await writable.close();
-
-      alert("Backup exportado com sucesso!");
-    } catch (err) {
-      if (err.name !== "AbortError") {
-        alert("Erro ao exportar o backup.");
-        console.error(err);
-      }
-    }
-  } else {
-    // Fallback automático para navegadores sem suporte
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "backup-2ndlife.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  // Exportação sempre usando método compatível com todos os navegadores
+  const blob = new Blob([jsonString], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "backup-2ndlife.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  alert("Backup exportado com sucesso!");
 }
 
 function importarBackup(event) {
