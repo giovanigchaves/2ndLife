@@ -21,23 +21,28 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarResponsividadeBackup();
 
   // Eventos para os links de backup no menu superior (responsivo)
-  // BOTÕES GRANDES (visíveis no desktop)
+  // BOTÃO GRANDE: Exportar (desktop)
   document
     .getElementById("btnExportarBackup")
-    ?.addEventListener("click", exportarBackup);
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
+      exportarBackup();
+    });
 
+  // BOTÃO GRANDE: Importar (desktop)
   document
     .getElementById("btnImportarBackup")
-    ?.addEventListener("click", () => {
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
       document.getElementById("inputImportarBackup").click();
     });
 
-  // INPUT HIDDEN que será acionado por qualquer botão ou link
+  // INPUT FILE invisível — usado por todos
   document
     .getElementById("inputImportarBackup")
     ?.addEventListener("change", importarBackup);
 
-  // LINKS DE MENU (visíveis em telas menores)
+  // LINKS DO MENU (modo responsivo)
   document
     .getElementById("linkExportarBackup")
     ?.addEventListener("click", (e) => {
