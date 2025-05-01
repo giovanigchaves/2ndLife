@@ -1,4 +1,3 @@
-<!-- DASHBOARD MODERNA - 2ndLife -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -6,55 +5,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | 2ndLife</title>
+
+    <!-- Estilos Globais e Específicos -->
     <link rel="stylesheet" href="css/global.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
+
+    <!-- Ícones FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-        integrity="xxxxx" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="body-dashboard">
-    <header class="topo">
 
+    <!-- Cabeçalho com menu de navegação fixo -->
+    <header class="topo" role="banner" aria-label="Cabeçalho da página">
         <div class="topo-container">
+
+            <!-- Logotipo -->
             <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
+
+            <!-- Slogan da plataforma -->
             <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
 
-            <nav class="topo-nav" id="topoNav">
+            <!-- Menu de navegação -->
+            <nav class="topo-nav" id="topoNav" role="navigation" aria-label="Menu principal">
                 <a href="#" id="menuLink" onclick="toggleMenu()">Menu</a>
                 <div class="menu-links">
-                  <a class="ativo" href="dashboard.html">Dashboard</a>
-                  <a href="#" onclick="abrirCadastroNovo()">Cadastrar Item</a>
-                  <a href="itens-cadastrados.html">Itens Cadastrados</a>
-                  <a href="#" onclick="sair()">Sair</a>
+                    <a class="ativo" href="dashboard.html">Dashboard</a>
+                    <a href="#" onclick="abrirCadastroNovo()">Cadastrar Item</a>
+                    <a href="itens-cadastrados.html">Itens Cadastrados</a>
+                    <a href="#" onclick="sair()">Sair</a>
                 </div>
-              </nav>
-              
-            <div class="perfil-miniatura" onclick="acessarPerfil()">
-                <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
+            </nav>
+
+            <!-- Miniatura do perfil do usuário logado -->
+            <div class="perfil-miniatura" onclick="acessarPerfil()" role="button" tabindex="0"
+                aria-label="Acessar perfil">
+                <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto do perfil do usuário" />
                 <span id="nomeMiniatura"></span>
             </div>
         </div>
-
-
     </header>
 
-    <main class="container">
-        <h2 id="boasVindas">Olá!</h2>
+    <!-- Conteúdo principal da página -->
+    <main class="container" role="main">
 
-        <div class="dashboard-colunas">
-            <div class="coluna-dashboard">
-                <h3>📦 Meus Itens</h3>
-                <div id="meusItens"></div>
-            </div>
-            <div class="coluna-dashboard">
-                <h3>💰 Minhas Ofertas</h3>
-                <div id="minhasOfertas"></div>
-            </div>
-        </div>
+        <!-- Saudação personalizada ao usuário -->
+        <h2 id="boasVindas" aria-live="polite">Olá!</h2>
+
+        <!-- Grid de colunas do dashboard -->
+        <section class="dashboard-colunas">
+
+            <!-- Coluna: Meus Itens -->
+            <article class="coluna-dashboard" aria-labelledby="meusItensTitulo">
+                <h3 id="meusItensTitulo">📦 Meus Itens</h3>
+                <div id="meusItens" role="region" aria-label="Lista de itens cadastrados pelo usuário"></div>
+            </article>
+
+            <!-- Coluna: Minhas Ofertas -->
+            <article class="coluna-dashboard" aria-labelledby="minhasOfertasTitulo">
+                <h3 id="minhasOfertasTitulo">💰 Minhas Ofertas</h3>
+                <div id="minhasOfertas" role="region" aria-label="Lista de ofertas realizadas"></div>
+            </article>
+
+        </section>
     </main>
 
+    <!-- Script -->
     <script src="js/dashboard.js" defer></script>
 </body>
 

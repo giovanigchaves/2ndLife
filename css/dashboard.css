@@ -1,7 +1,11 @@
+/* === CONTAINER GERAL DA DASHBOARD === */
 .container {
-  margin: 110px auto 40px;
+  margin: 120px auto 40px;
+  padding: 30px;
+  max-width: 1200px;
 }
 
+/* === LAYOUT DAS DUAS COLUNAS PRINCIPAIS === */
 .dashboard-colunas {
   display: flex;
   gap: 40px;
@@ -9,6 +13,7 @@
   flex-wrap: wrap;
 }
 
+/*  === Cada coluna do painel   === */
 .coluna-dashboard {
   flex: 1 1 45%;
   display: flex;
@@ -16,14 +21,17 @@
   gap: 20px;
 }
 
+/*  === Título de cada coluna  === */
 .coluna-dashboard h3 {
   margin-top: 0;
   color: #2c3e50;
   border-bottom: 2px solid #00a86b;
   padding-bottom: 6px;
   font-size: 1.2rem;
+  font-weight: 600;
 }
 
+/* === CARTÃO DE ITEM (MEUS ITENS E MINHAS OFERTAS) === */
 .card-item {
   background-color: #ffffff;
   padding: 16px;
@@ -38,10 +46,12 @@
   margin-bottom: 13px;
 }
 
+/*  === Animação no hover === */
 .card-item:hover {
   transform: translateY(-4px);
 }
 
+/* === Imagem do item no card === */
 .card-item img {
   width: 80px;
   height: 80px;
@@ -50,22 +60,32 @@
   flex-shrink: 0;
 }
 
+/* === estilo para itens expirados === */
+.card-item.item-expirado {
+  border: 2px solid #ae5656;
+  background-color: #fff3f3;
+}
+
+/* === Informações textuais do item === */
 .card-info {
   flex-grow: 1;
 }
 
+/* === Nome do item === */
 .card-info h4 {
   margin: 0 0 4px 0;
   color: #2c3e50;
   font-size: 1rem;
 }
 
+/* === Demais informações === */
 .card-info p {
   margin: 4px 0;
   font-size: 14px;
   color: #555;
 }
 
+/* === ESTILO DIFERENCIADO PARA ITENS COM OFERTAS === */
 .item-com-lance {
   position: relative;
   border: 2px solid transparent;
@@ -74,19 +94,11 @@
   border-color: #00e676;
 }
 
+/* === RESPONSIVIDADE === */
 
 @media (max-width: 768px) {
   .dashboard-colunas {
     flex-direction: column;
-  }
-  .coluna-dashboard {
-    flex: 1 1 100%;
-  }
-}
-@media (max-width: 480px) {
-  .dashboard-colunas {
-    flex-direction: column;
-    gap: 20px;
   }
 
   .coluna-dashboard {
@@ -104,5 +116,30 @@
 
   .card-info p {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-colunas {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .coluna-dashboard {
+    flex: 1 1 100%;
+  }
+
+  .card-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-item img {
+    width: 100%;
+    height: auto;
+  }
+
+  .card-info {
+    width: 100%;
   }
 }

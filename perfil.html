@@ -2,88 +2,95 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perfil do Usuário</title>
-    <link rel="stylesheet" href="css/global.css" />
-    <link rel="stylesheet" href="css/perfil.css" />
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil do Usuário</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/perfil.css" />
 </head>
 
 <body class="body-perfil">
-    <header class="topo">
-        <div class="topo-container">
-            <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
-            <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
+  <!-- Cabeçalho com navegação e miniatura de perfil -->
+  <header class="topo">
+    <div class="topo-container">
+      <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
+      <p class="slogan">"Seus itens ganhando uma nova vida!"</p>
 
-            <nav class="topo-nav" id="topoNav">
-                <a href="#" id="menuLink" onclick="toggleMenu()">Menu</a>
-                <div class="menu-links">
-                    <a href="dashboard.html">Dashboard</a>
-                    <a href="cadastro-item.html" id="linkCadastrarItem" onclick="abrirCadastroNovo()">Cadastrar Item</a>
-                    <a href="itens-cadastrados.html">Itens Cadastrados</a>
-                    <a href="#" onclick="sair()">Sair</a>
-                </div>
-            </nav>
+      <nav class="topo-nav" id="topoNav">
+        <a href="#" id="menuLink" onclick="toggleMenu()">Menu</a>
+        <div class="menu-links">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="cadastro-item.html" id="linkCadastrarItem" onclick="abrirCadastroNovo()">Cadastrar Item</a>
+          <a href="itens-cadastrados.html">Itens Cadastrados</a>
+          <a href="#" onclick="sair()">Sair</a>
+        </div>
+      </nav>
 
-            <div class="perfil-miniatura">
-                <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
-                <span id="nomeMiniatura">Usuário</span>
-            </div>
+      <div class="perfil-miniatura">
+        <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
+        <span id="nomeMiniatura">Usuário</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container principal do conteúdo de perfil -->
+  <main class="container">
+    <h2>Meu Perfil</h2>
+
+    <!-- Visualização dinâmica da imagem selecionada -->
+    <div class="preview-foto">
+      <img id="previewFoto" src="assets/avatar-default.png" alt="Prévia da foto de perfil" />
+    </div>
+
+    <!-- Formulário de edição de perfil -->
+    <form id="formPerfil" class="form-perfil">
+      <div class="card-container">
+        <!-- Coluna esquerda com dados pessoais -->
+        <div class="coluna-esquerda">
+          <label for="fotoPerfil">Foto do Perfil</label>
+          <input type="file" id="fotoPerfil" accept="image/*" />
+
+          <label for="nomePerfil">Nome</label>
+          <input type="text" id="nomePerfil" required />
+
+          <label for="emailPerfil">E-mail</label>
+          <input type="email" id="emailPerfil" disabled />
+
+          <label for="telefonePerfil">Telefone</label>
+          <input type="tel" id="telefonePerfil" />
+
+          <label for="cep">CEP</label>
+          <input type="text" id="cep" maxlength="9" />
         </div>
 
-    </header>
-<div class="container">
-  <h2>Meu Perfil</h2>
-  <div id="previewFoto"></div>
+        <!-- Coluna direita com endereço -->
+        <div class="coluna-direita">
+          <label for="rua">Rua</label>
+          <input type="text" id="rua" />
 
-  <form id="formPerfil" class="form-perfil">
-    <div class="card-container">
-        
-      <div class="coluna-esquerda">
-        <label for="nomePerfil">Foto do Perfil</label>
-        <input type="file" id="fotoPerfil" accept="image/*" />
+          <label for="numero">Número</label>
+          <input type="text" id="numero" />
 
-        <label for="nomePerfil">Nome</label>
-        <input type="text" id="nomePerfil" required />
+          <label for="bairro">Bairro</label>
+          <input type="text" id="bairro" />
 
-        <label for="emailPerfil">E-mail</label>
-        <input type="email" id="emailPerfil" disabled />
+          <label for="cidade">Cidade</label>
+          <input type="text" id="cidade" />
 
-        <label for="telefonePerfil">Telefone</label>
-        <input type="tel" id="telefonePerfil" />
-
-        <label for="cep">CEP</label>
-        <input type="text" id="cep" maxlength="9" />
+          <label for="estado">Estado</label>
+          <input type="text" id="estado" />
+        </div>
       </div>
+    </form>
+
+    <!-- Botão de submissão fora do form, com referência direta ao id -->
+    <div class="area-botao">
+      <button type="submit" form="formPerfil" class="btn-salvar">Salvar Perfil</button>
     </div>
+  </main>
 
-    <div class="card-container">
-      <div class="coluna-direita">
-        <label for="rua">Rua</label>
-        <input type="text" id="rua" />
-
-        <label for="numero">Número</label>
-        <input type="text" id="numero" />
-
-        <label for="bairro">Bairro</label>
-        <input type="text" id="bairro" />
-
-        <label for="cidade">Cidade</label>
-        <input type="text" id="cidade" />
-
-        <label for="estado">Estado</label>
-        <input type="text" id="estado" />
-      </div>
-    </div>
-  </form>
-  <div class="area-botao">
-    <button type="submit" form="formPerfil" class="btn-salvar">Salvar Perfil</button>
-  </div>
-</div>
-
-
-    <script src="js/perfil.js"></script>
+  <!-- Script -->
+  <script src="js/perfil.js"></script>
 </body>
 
 </html>

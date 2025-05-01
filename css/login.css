@@ -1,47 +1,76 @@
+/* === LAYOUT PRINCIPAL === */
 .body-login {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100vh; /* Tela inteira */
   margin: 0;
 }
 
-.container {
+/* === Container principal da tela de login === */
+.login-container {
   width: 450px;
+  padding: 40px;
+  background-color: #f6f2f1;
+  border-radius: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
+/* === LOGO E CABEÇALHO === */
+
+/* Logo da página */
 .logo-img {
   width: 150px;
-  margin: 0 auto;
+  margin: 0 auto 20px;
+  display: block;
 }
 
+/* === Slogan abaixo do logo === */
 .slogan {
   font-size: 1rem;
+  font-style: italic;
+  color: #444;
+  margin-bottom: 10px;
 }
 
+/* === Título principal da tela de login === */
 .logo-login {
   font-size: 1.8rem;
   font-weight: 600;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
+/* === FORMULÁRIO DE LOGIN === */
+
+/* === label === */
+.form-login label{
+  text-align: start;
+}
+
+
+/* === Botão "Entrar" === */
 .btn-entrar-login {
   margin-bottom: 10px;
 }
 
+/* === Mensagens abaixo do botão === */
 .mensagem-login {
-  color: #c0392b;
   font-size: 0.9rem;
   margin-top: 10px;
 }
+
+/* === Cores para feedback visual === */
 .mensagem-login.ok {
-  color: #27ae60;
+  color: #27ae60; /* Verde - sucesso */
 }
 
 .mensagem-login.erro {
-  color: #c0392b;
+  color: #c0392b; /* Vermelho - erro */
 }
+
+/* === LINK PARA CADASTRO === */
 
 .account-login {
   font-size: 1rem;
@@ -52,6 +81,7 @@
 .account-login a {
   color: #2b7a78;
   text-decoration: none;
+  transition: text-decoration 0.3s;
 }
 
 .account-login a:hover {

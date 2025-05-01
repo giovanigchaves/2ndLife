@@ -5,15 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Itens Cadastrados</title>
+
+  <!-- Estilos globais e específicos da página -->
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/itens-cadastrados.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap"
-    rel="stylesheet">
 
-
+  <!-- Fontes Google -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap" rel="stylesheet">
 </head>
 
 <body class="body-itens">
+  <!-- Cabeçalho  -->
   <header class="topo">
     <div class="topo-container">
       <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="topo-logo" />
@@ -25,34 +27,36 @@
           <a href="dashboard.html">Dashboard</a>
           <a href="#" onclick="abrirCadastroNovo()">Cadastrar Item</a>
           <a class="ativo" href="itens-cadastrados.html">Itens Cadastrados</a>
+          
+          <!-- Links de backup visíveis apenas em telas menores -->
           <a href="#" id="linkExportarBackup" class="link-backup hidden">Exportar Backup</a>
           <a href="#" id="linkImportarBackup" class="link-backup hidden">Importar Backup</a>
           <a href="#" onclick="sair()">Sair</a>
         </div>
       </nav>
 
-
+      <!-- Miniatura do perfil com imagem e nome do usuário -->
       <div class="perfil-miniatura" onclick="window.location.href='perfil.html'">
         <img id="fotoMiniatura" src="assets/avatar-default.png" alt="Foto de perfil" />
         <span id="nomeMiniatura">Usuário</span>
       </div>
     </div>
-
   </header>
 
+  <!-- Botões flutuantes para backup (visíveis apenas em telas largas) -->
   <div class="botoes-backup-flutuantes">
     <button id="btnExportarBackup" class="btn-cadastro">Exportar</button>
     <input type="file" id="inputImportarBackup" accept=".json" hidden />
     <button id="btnImportarBackup" class="btn-cadastro">Importar</button>
   </div>
 
-
+  <!-- Bloco de filtros e busca -->
   <div class="filtros-bloco">
     <div class="filtros-container">
-      <!-- Busca -->
+      <!-- Campo de busca livre -->
       <input type="text" id="campoBusca" placeholder="Buscar..." />
 
-      <!-- Filtros -->
+      <!-- Filtros de seleção por criador, categoria, cidade e ordenação -->
       <div class="filtros-grupo">
         <select id="filtroCriador">
           <option value="">Criador</option>
@@ -75,44 +79,42 @@
           <option value="duracao">Duração</option>
           <option value="termino">Término</option>
         </select>
-
       </div>
 
+      <!-- Botão de limpar filtros (visível apenas se houver algum filtro ativo) -->
       <div id="limparFiltrosContainer" class="hidden">
         <button id="btnLimparFiltros" class="btn-cadastro">Limpar</button>
       </div>
     </div>
 
-
+    <!-- Bloco que lista os itens após aplicação de filtros -->
     <div class="container-itens">
       <h1 class="logo">Itens Cadastrados</h1>
-
       <div id="listaItens" class="lista-itens"></div>
-
     </div>
 
-    <!-- modal detalhes do item -->
+    <!-- Modal para exibir detalhes de um item (acessada via botão Ver Mais) -->
     <div id="modalItem" class="modal hidden">
       <div class="modal-conteudo">
         <span class="fechar-modal" onclick="fecharModal()">&times;</span>
-        <!-- detalhes inseridos via js. -->
         <div id="modalDetalhes"></div>
       </div>
     </div>
 
-    <!-- Modal de confirmação para ações (cadastrar, editar, excluir) -->
+    <!-- Modal de feedback para ações como cadastrar, editar ou excluir -->
     <div class="modal-acao modal-confirmacao hidden">
       <div class="modal-acao-content">
         <p>Item excluído com sucesso!</p>
       </div>
     </div>
-    <!-- Visualizador de imagem (lightbox) -->
+
+    <!-- Modal com visualização da imagem em tamanho grande -->
     <div class="visualizador-imagem hidden" id="visualizadorImagem">
       <span class="fechar-visualizador" onclick="fecharVisualizadorImagem()">×</span>
       <img id="imagemAmpliada" src="" alt="Visualização da imagem" />
     </div>
 
-    <!-- Modal de Oferta -->
+    <!-- Modal de envio de oferta para o item -->
     <div id="modalOferta" class="modal hidden">
       <div class="modal-conteudo">
         <span class="fechar-modal" onclick="fecharModalOferta()">&times;</span>
@@ -137,14 +139,12 @@
 
           <button type="submit" class="btn-fazer-oferta" style="margin-top: 15px;">Enviar Oferta</button>
         </form>
-
-
-
       </div>
     </div>
+  </div>
 
-
-    <script src="js/itens-cadastrados.js"></script>
+  <!-- Script -->
+  <script src="js/itens-cadastrados.js"></script>
 </body>
 
 </html>

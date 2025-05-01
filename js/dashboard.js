@@ -1,127 +1,174 @@
-// dashboard.js
+// ===========================================
+// Inicialização ao carregar a página
+// ===========================================
 
-// Proteção da rota e carregamento
 window.addEventListener("DOMContentLoaded", () => {
-  const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-  const usuario = perfis[emailUsuarioLogado];
+  const usuario = getUsuarioAtual();
 
+  // Se não estiver logado, redireciona para o login
   if (!usuario) {
     window.location.href = "login.html";
     return;
   }
 
-  const boasVindas = document.getElementById("boasVindas");
-  if (boasVindas) boasVindas.textContent = `Bem-vindo, ${usuario.nome}!`;
-
-  if (usuario.fotoPerfil)
-    document.getElementById("fotoMiniatura").src = usuario.fotoPerfil;
-
+  // Atualiza saudação e perfil visual
+  document.getElementById("boasVindas").textContent = `Olá, ${usuario.nome}!`;
+  document.getElementById("fotoMiniatura").src =
+    usuario.fotoPerfil || "assets/avatar-default.png";
   document.getElementById("nomeMiniatura").textContent = usuario.nome;
 
+  // Carrega informações do painel
   carregarMeusItens(usuario);
   carregarMinhasOfertas(usuario);
 });
 
-function sair() {
-  sessionStorage.removeItem("usuarioLogado");
-  window.location.href = "login.html";
+// ===========================================
+// Função utilitária: obter usuário atual logado
+// ===========================================
+
+function getUsuarioAtual() {
+  const email = sessionStorage.getItem("usuarioLogado");
+  if (!email) return null;
+
+  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
+  return perfis[email] || null;
 }
+
+// ===========================================
+// Sessão: Meus Itens (criados pelo usuário)
+// ===========================================
 
 function carregarMeusItens(usuario) {
   const container = document.getElementById("meusItens");
   container.innerHTML = "";
-  const itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
-  const meusItens = itens.filter((item) => item.criador === usuario.nome);
+
+  const todosItens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
+
+  // Filtra apenas os itens criados por este usuário
+  const meusItens = todosItens.filter((item) => item.criador === usuario.nome);
 
   if (meusItens.length === 0) {
     container.innerHTML = "<p>Você ainda não cadastrou nenhum item.</p>";
     return;
   }
 
+  // Renderiza cada item
   meusItens.forEach((item) => {
-    const card = criarCardItem(item);
+    const card = criarCardItem(item, null, null);
     container.appendChild(card);
   });
 }
 
+// ===========================================
+// Sessão: Minhas Ofertas (feitas pelo usuário)
+// ===========================================
+
 function carregarMinhasOfertas(usuario) {
   const container = document.getElementById("minhasOfertas");
   container.innerHTML = "";
-  const ofertas = JSON.parse(localStorage.getItem("ofertas")) || [];
-  const itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
-  const minhas = ofertas.filter((o) => o.interessado === usuario.nome);
 
-  if (minhas.length === 0) {
+  const todasOfertas = JSON.parse(localStorage.getItem("ofertas")) || [];
+  const todosItens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
+
+  // Seleciona apenas as ofertas feitas por este usuário
+  const minhasOfertas = todasOfertas.filter(
+    (o) => o.interessado === usuario.nome
+  );
+
+  if (minhasOfertas.length === 0) {
     container.innerHTML = "<p>Você ainda não fez nenhuma oferta.</p>";
     return;
   }
 
-  minhas.forEach((oferta) => {
-    const item = itens.find((i) => i.id === oferta.itemId);
+  // Para cada oferta feita, busca o item correspondente e monta card
+  minhasOfertas.forEach((oferta) => {
+    const item = todosItens.find((i) => i.id === oferta.itemId);
     if (!item) return;
 
-    const fim = new Date(
-      new Date(item.dataCadastro).getTime() + parseInt(item.duracao) * 86400000
-    );
-    const expirado = fim < new Date();
-    const todasOfertas = ofertas.filter((o) => o.itemId === item.id);
-    const maior = todasOfertas.sort(
-      (a, b) => parseFloat(b.valor) - parseFloat(a.valor)
-    )[0];
-    let status = expirado
-      ? maior?.interessado === usuario.nome
-        ? "✅ Você venceu o lance"
-        : "❌ Outro usuário venceu"
-      : `⏳ Termina em ${Math.ceil((fim - new Date()) / 86400000)} dia(s)`;
+    const expirado = itemEstaExpirado(item);
+    const melhoresOfertas = todasOfertas.filter((o) => o.itemId === item.id);
+
+    // Ordena ofertas pelo valor (maior primeiro)
+    melhoresOfertas.sort((a, b) => parseFloat(b.valor) - parseFloat(a.valor));
+    const melhorOferta = melhoresOfertas[0];
+
+    // Determina o status da oferta do usuário
+    let status = "";
+
+    if (expirado) {
+      status =
+        melhorOferta?.interessado === usuario.nome
+          ? "✅ Você venceu o lance"
+          : "❌ Outro usuário venceu";
+    } else {
+      const diasRestantes = calcularDiasRestantes(item);
+      console.log(diasRestantes);
+      status = `⏳ Termina em ${diasRestantes} dia${
+        diasRestantes !== 1 ? "s" : ""
+      }`;
+    }
 
     const card = criarCardItem(item, oferta, status);
     container.appendChild(card);
   });
 }
 
+// ===========================================
+// Criação visual do card de item
+// ===========================================
+
 function criarCardItem(item, oferta = null, status = null) {
   const div = document.createElement("div");
   div.className = "card-item";
 
-  const ofertas = JSON.parse(localStorage.getItem("ofertas")) || [];
-  const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-  const usuario = perfis[emailUsuarioLogado];
+  // Verifica se o item tem ofertas recebidas (se for criador)
+  const usuario = getUsuarioAtual();
+  const todasOfertas = JSON.parse(localStorage.getItem("ofertas")) || [];
+  const ofertasDoItem = todasOfertas.filter((o) => o.itemId === item.id);
 
-  const ofertasRecebidas = ofertas.filter(
-    (oferta) => oferta.itemId === item.id
-  );
+  const ehCriador = item.criador.toLowerCase() === usuario.nome.toLowerCase();
+  const possuiOfertas = ofertasDoItem.length > 0;
 
-  if (
-    item.criador &&
-    usuario.nome &&
-    item.criador.toLowerCase() === usuario.nome.toLowerCase() &&
-    ofertasRecebidas.length > 0
-  ) {
-    div.classList.add("item-com-lance");
+  if (ehCriador && possuiOfertas) {
+    div.classList.add("item-com-lance"); // altera o estilo
   }
 
+  // Imagem do item (ou padrão)
   const img = document.createElement("img");
   img.src = item.fotos?.[0] || "assets/no-image.png";
 
+  // Informações do item
   const info = document.createElement("div");
   info.className = "card-info";
 
-  const h4 = document.createElement("h4");
-  h4.textContent = item.nome;
+  const nome = document.createElement("h4");
+  nome.textContent = item.nome;
 
-  const cat = document.createElement("p");
-  cat.textContent = `Categoria: ${item.categoria}`;
+  const categoria = document.createElement("p");
+  categoria.textContent = `Categoria: ${item.categoria}`;
 
   const statusEl = document.createElement("p");
-  statusEl.textContent = status || `⏳ Termina em ${item.duracao}`;
 
-  info.appendChild(h4);
-  info.appendChild(cat);
+  let diasRestantes = calcularDiasRestantes(item);
+
+  if (status) {
+    statusEl.textContent = status;
+  } else {
+    statusEl.textContent = `⏳ Termina em ${diasRestantes} dia${
+      diasRestantes !== 1 ? "s" : ""
+    }`;
+  }
+
+  // Aplica a classe se o item estiver expirado OU o usuário tiver vencido
+  if (diasRestantes <= 0 || status === "✅ Você venceu o lance") {
+    div.classList.add("item-expirado");
+  }
+
+  info.appendChild(nome);
+  info.appendChild(categoria);
   info.appendChild(statusEl);
 
-  const ofertasDoItem = ofertas.filter((o) => o.itemId === item.id);
+  // Se houver ofertas, mostra lance atual
   if (ofertasDoItem.length > 0) {
     const maiorLance = Math.max(
       ...ofertasDoItem.map((o) => parseFloat(o.valor))
@@ -131,28 +178,56 @@ function criarCardItem(item, oferta = null, status = null) {
     info.appendChild(lanceAtual);
   }
 
+  // Monta o card final
   div.appendChild(img);
   div.appendChild(info);
 
+  // Clique abre os detalhes do item
   div.addEventListener("click", () => abrirDetalhesItem(item));
 
   return div;
 }
 
+// ===========================================
+// Funções auxiliares
+// ===========================================
+
 function abrirDetalhesItem(item) {
   sessionStorage.setItem("itemDetalhado", JSON.stringify(item));
-  sessionStorage.setItem("origemDetalhes", window.location.pathname); // armazena a origem
+  sessionStorage.setItem("origemDetalhes", window.location.pathname);
   window.location.href = "detalhes-item.html";
 }
-// ao clicar no botao Cadastrar Item, direciona para pagina de cadastro.
+
+function itemEstaExpirado(item) {
+  const dataCadastro = new Date(item.dataCadastro);
+  const dias = parseInt(item.duracao);
+  const dataFim = new Date(dataCadastro.getTime() + dias * 86400000);
+  return new Date() > dataFim;
+}
+
+function calcularDiasRestantes(item) {
+  const dataCadastro = new Date(item.dataCadastro);
+  const dias = parseInt(item.duracao);
+  const dataFim = new Date(dataCadastro.getTime() + dias * 86400000);
+  const hoje = new Date();
+  const diffMs = dataFim - hoje;
+  return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+}
+
 function abrirCadastroNovo() {
   sessionStorage.removeItem("itemEmEdicao");
   window.location.href = "cadastro-item.html";
 }
-// Acessar Perfil
+
 function acessarPerfil() {
   window.location.href = "perfil.html";
 }
+
+function sair() {
+  sessionStorage.removeItem("usuarioLogado");
+  window.location.href = "login.html";
+}
+
 function toggleMenu() {
   const links = document.querySelector(".menu-links");
   links.classList.toggle("show");

@@ -16,8 +16,6 @@ O objetivo é capacitar talentos para criarem soluções reais com tecnologias m
 
  ***Asse o projeto no GitHub Pages*** ⋙ **<a href="https://giovanigchaves.github.io/2ndLife/" target="_blank">GitHub Pages</a>**.
 
-
-
 ---
    
 <img src="https://github.com/user-attachments/assets/729e147e-96f0-4418-b9b5-8b3b9f7198ce" width="100px" height="100px" alt="2ndLife">

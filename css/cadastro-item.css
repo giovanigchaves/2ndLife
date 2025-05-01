@@ -1,23 +1,19 @@
+/* === ESTRUTURA GERAL === */
+
 .body-cadastro-item {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+}
+
+/* === CONTAINER DO FORMULÁRIO === */
+
+.container {
+  margin-top: 120px;
 }
 
 .cadastro-item form {
   text-align: start;
-}
-
-#previewFotosEdicao {
-  min-height: 100px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  justify-content: start;
-  margin-top: 10px;
-  display: none;
 }
 
 #formCadastroItem {
@@ -26,26 +22,7 @@
   justify-content: space-around;
 }
 
-.btn-fechar {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: none;
-  border: none;
-  text-decoration: none;
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-  cursor: pointer;
-  z-index: 10;
-  transition: color 0.2s ease;
-  padding: 10px;
-}
-
-.btn-fechar:hover {
-  color: #c0392b;
-  cursor: pointer;
-}
+/* === TÍTULO === */
 
 .logo {
   font-family: "Montserrat", sans-serif;
@@ -55,6 +32,29 @@
   margin-top: 0px;
 }
 
+/* === ESTRUTURA EM DUAS COLUNAS === */
+
+.formulario-duplo {
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.coluna-esquerda,
+.coluna-direita {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+}
+
+.coluna-esquerda textarea {
+  margin-bottom: 10px;
+}
+
+/* === INPUTS E GRUPOS === */
+
 .input-group {
   display: flex;
   align-items: center;
@@ -62,112 +62,63 @@
 }
 
 .input-group select {
-  flex: 9; /* 90% da linha */
+  flex: 9;
   padding: 12px;
   font-size: 16px;
   border-radius: 10px;
   border: 1px solid #ccc;
   margin-right: 8px;
 }
-.btn-add-categoria {
-  flex: 1; /*10% da linha */
-  padding: 5px;
-  font-size: 2rem;
+
+.btn.btn-az {
+  flex: 1;
+  margin: 0;
+  padding: 10px;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-top: 0;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 20px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-  position: relative;
-  text-align: center;
-}
-.hidden,
-.modal.hidden {
-  display: none;
-}
-.btn-gerenciar {
-  margin-top: 10px;
-}
-
-.btn-apagar {
-  padding: 12px;
-}
-
-.editar-box {
-  margin-top: 15px;
-}
-.editar-box input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
   border-radius: 10px;
-  box-sizing: border-box;
-  font-family: "Roboto", sans-serif;
-}
-.modal-confirmacao {
-  position: fixed;
-  font-size: 1.4rem;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* fundo escuro e translúcido */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  border: none;
+  background-color: #0077b6;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.modal-confirmacao.show {
-  opacity: 1;
-  pointer-events: auto;
+.btn.btn-az:hover {
+  background-color: #005f87;
 }
-.btn-apagar.confirmar-apagar {
-  font-weight: bold;
-  letter-spacing: 1px;
+
+.grupo-botoes-modal .btn {
+  font-size: 1rem;
 }
-.mensagem-categoria {
-  color: red;
-  font-weight: bold;
+
+/* === BOTÃO DE CADASTRO === */
+
+.btn-cadastro {
   margin-top: 10px;
-  font-size: 14px;
 }
+
+/* === PRÉ-VISUALIZAÇÃO DAS FOTOS COM ROLAGEM === */
+
 .preview-fotos-edicao {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
-  justify-content: center;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
 }
+
 .preview-fotos-edicao .foto-preview {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
   position: relative;
   width: 100px;
   height: 100px;
 }
+
 .preview-fotos-edicao img {
   width: 100px;
   height: 100px;
@@ -175,6 +126,7 @@
   border-radius: 8px;
   border: 1px solid #ccc;
 }
+
 .preview-fotos-edicao .btn-remover-foto {
   position: absolute;
   top: -19px;
@@ -191,6 +143,130 @@
   align-items: center;
   justify-content: center;
 }
+
+/* === MODAIS (Nova Categoria / Gerenciar) === */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  text-align: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+/* === BOTÃO DE FECHAR MODAL === */
+
+.btn-fechar {
+  position: absolute;
+  width: 30px;
+  margin: 0;
+  top: 5px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  z-index: 10;
+  padding: 15px;
+  transition: color 0.2s ease;
+}
+
+.btn-fechar:hover {
+  color: #c0392b;
+}
+
+/*  === Grupo de botões dentro da modal nova categoria  === */
+
+.grupo-botoes-modal {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* === MODAL DE GERENCIAMENTO DE CATEGORIAS === */
+
+.editar-box {
+  margin-top: 15px;
+}
+
+.editar-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+.btn-editar-modal,
+.btn-excluir-modal {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-editar-modal {
+  background-color: #f4a261;
+  color: white;
+}
+
+.btn-editar-modal:hover {
+  background-color: #d48b36;
+}
+
+.btn-excluir-modal {
+  background-color: #e63946;
+  color: white;
+}
+
+.btn-excluir-modal:hover {
+  background-color: #c82333;
+}
+
+.confirmar-apagar {
+  font-weight: bold;
+  letter-spacing: 1px;
+  background-color: #d62828 !important;
+}
+
+/* === MENSAGEM DE ERRO NA MODAL === */
+
+.mensagem-categoria {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* === MODAL DE CONFIRMAÇÃO === */
+
 .modal-acao {
   position: fixed;
   top: 0;
@@ -202,6 +278,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  transition: opacity 0.3s ease;
 }
 
 .modal-acao.hidden {
@@ -219,27 +296,25 @@
   font-family: "Poppins", sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #c62828;
+  color: #2e7d32;
   text-align: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.formulario-duplo {
-  display: flex;
-  flex-direction: row;
-  gap: 50px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
+/* === RESPONSIVIDADE === */
 
-.coluna-esquerda,
-.coluna-direita {
-  flex: 1 1 45%;
-  display: flex;
-  flex-direction: column;
-}
+@media (max-width: 768px) {
+  .formulario-duplo {
+    flex-direction: column;
+  }
 
-.coluna-direita p {
-  margin-top: 0;
-  margin-bottom: 10px;
+  .coluna-esquerda,
+  .coluna-direita {
+    width: 100%;
+  }
+
+  .preview-fotos-edicao img {
+    width: 80px;
+    height: 80px;
+  }
 }

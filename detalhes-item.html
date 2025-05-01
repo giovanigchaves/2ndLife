@@ -5,99 +5,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detalhes do Item | 2ndLife</title>
+
+  <!-- Estilos globais e específicos -->
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/detalhes-item.css" />
+
+  <!-- Fontes externas -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap"
+    rel="stylesheet">
 </head>
 
-<body class="body-dashboard">
-  <main class="container">
-    <div class="detalhes-conteudo">
-      <button class="fechar-detalhes" id="fecharPagina">&times;</button>
-      <strong class="nomeUsuariostrong">Cadastrado por: <strong class="nomeUsuarioCad"
-          id="criadorItem"></strong></strong>
-      <hr />
-      <h2 id="tituloItem"></h2>
+<body>
+  <!-- Container  -->
+  <main class="container" style="margin-top: 40px">
+    <!-- Botão de retorno (X) -->
+    <button id="fecharPagina" class="fechar-modal">×</button>
 
-      <div class="detalhes-superior">
-        <div class="coluna-esquerda">
-          <h3>📦 Informações do Item</h3>
-          <p><strong>Descrição:</strong><br><span id="descricaoItem"></span></p>
-          <p><strong>Categoria:</strong> <span id="categoriaItem"></span></p>
-          <p><strong>Quantidade:</strong> <span id="quantidadeItem"></span></p>
-          <p><strong>Duração:</strong> <span id="prazoItem"></span></p>
-          <p><strong>Data de Cadastro:</strong> <span id="dataCadastroItem"></span></p>
-          <p><strong>Término:</strong> <span id="dataTerminoItem"></span></p>
-          <p><strong>⏳ Faltam:</strong> <span id="diasRestantesItem"></span></p>
-        </div>
+    <!-- Bloco superior com título e criador -->
+    <div class="nomeUsuariostrong">
+      <span>Publicado por:</span>
+      <span id="criadorItem" class="nomeUsuarioCad"></span>
+    </div>
 
-        <div class="coluna-direita">
-          <h3>📍 Localização</h3>
-          <p><strong>Cidade:</strong> <span id="cidadeItem"></span></p>
-          <p><strong>Bairro:</strong> <span id="bairroItem"></span></p>
-          <p><strong>Rua:</strong> <span id="ruaItem"></span></p>
-          <p><strong>Número:</strong> <span id="numeroItem"></span></p>
-        </div>
+    <!-- Título do item -->
+    <h2 id="tituloItem"></h2>
+
+    <!-- Grid com seções laterais de detalhes -->
+    <div class="detalhes-grid">
+      <div class="coluna">
+        <p><strong>Descrição:</strong> <span id="descricaoItem"></span></p>
+        <p><strong>Categoria:</strong> <span id="categoriaItem"></span></p>
+        <p><strong>Quantidade:</strong> <span id="quantidadeItem"></span></p>
+        <p><strong>Prazo do Leilão:</strong> <span id="prazoItem"></span> dias</p>
+        <p><strong>Data de Cadastro:</strong> <span id="dataCadastroItem"></span></p>
+        <p><strong>Data de Término:</strong> <span id="dataTerminoItem"></span></p>
+        <p><strong>Dias Restantes:</strong> <span id="diasRestantesItem"></span></p>
       </div>
-
-      <!-- Bloco para ofertas recebidas -->
-      <div class="detalhes-bloco hidden" id="ofertasRecebidas">
-        <h3>💬 Ofertas Recebidas</h3>
-        <div id="listaOfertas"></div>
+      <div class="coluna">
+        <p><strong>CEP:</strong> <span id="cepItem"></span></p>
+        <p><strong>Rua:</strong> <span id="ruaItem"></span></p>
+        <p><strong>Número:</strong> <span id="numeroItem"></span></p>
+        <p><strong>Bairro:</strong> <span id="bairroItem"></span></p>
+        <p><strong>Cidade:</strong> <span id="cidadeItem"></span></p>
+        <p><strong>Estado:</strong> <span id="estadoItem"></span></p>
       </div>
+    </div>
 
-      <!-- Bloco para exibir ou inserir oferta -->
-      <div class="detalhes-bloco" id="botaoOfertaContainer"></div>
+    <!-- Galeria horizontal de fotos -->
+    <div id="fotosItem" class="fotos-detalhe"></div>
 
-      <div class="fotos-detalhe" id="fotosItem"></div>
+    <!-- Botões de ação do item (visíveis apenas se for criador) -->
+    <div class="btns-acoes">
+      <button id="editarItem" class="btn-editar">Editar</button>
+      <button id="excluirItem" class="btn-excluir">Excluir</button>
+    </div>
 
-      <div class="btns-acoes">
-        <button class="btn-editar" id="editarItem">Editar</button>
-        <button class="btn-excluir" id="excluirItem">Excluir</button>
-      </div>
+    <!-- Botão para realizar oferta (visível se nao for o criador) -->
+    <div id="botaoOfertaContainer" class="area-botao"></div>
+
+    <!-- Seção de ofertas recebidas ou ganhador -->
+    <div id="ofertasRecebidas" class="ofertas-recebidas hidden">
+      <div id="listaOfertas"></div>
     </div>
   </main>
 
   <!-- Modal de oferta -->
-  <div class="modal-oferta hidden" id="modalOferta">
+  <div id="modalOferta" class="modal-oferta hidden">
     <div class="modal-oferta-conteudo">
-      <button class="fechar-modal" id="fecharOferta">&times;</button>
-      <h3>Fazer uma oferta</h3>
-
+      <h3>Envie sua proposta</h3>
       <label for="tipoOferta">Tipo de oferta:</label>
       <select id="tipoOferta">
-        <option value="" selected disabled>Selecione uma opção</option>
-        <option value="pagarei">Tenho interesse e pago pelo(s) item(s).</option>
-        <option value="gratis">Tenho interesse e retiro no local gratuitamente.</option>
-        <option value="cobro">Cobro para retirar o item e dar destino apropriado.</option>
+        <option value="">Selecione</option>
+        <option value="pagarei">Tenho interesse e pagarei</option>
+        <option value="retirarGratis">Tenho interesse e retiro gratuitamente</option>
+        <option value="cobro">Dou destino adequado, mas cobro</option>
       </select>
 
-      <div id="campoValor" class="hidden">
-        <label for="valorOferta">Valor:</label>
-        <div class="campo-moeda">
-          <span>R$</span>
-          <input type="number" id="valorOferta" min="0" step="0.01" />
-        </div>
+      <div class="campo-moeda hidden" id="campoValor">
+        <span>R$</span>
+        <input type="number" id="valorOferta" placeholder="Valor" />
       </div>
 
-      <label for="mensagemOferta">Mensagem (opcional):</label>
-      <textarea id="mensagemOferta" rows="3" placeholder="Digite uma mensagem..."></textarea>
+      <label for="mensagemOferta">Mensagem:</label>
+      <textarea id="mensagemOferta" placeholder="Adicione uma observação opcional..."></textarea>
 
-      <div class="campo-formulario" id="campoTelefone">
-        <label for="telefoneOferta">Telefone de Contato:</label>
-        <input type="tel" id="telefoneOferta" name="telefoneOferta" required />
-      </div>
+      <label for="telefoneOferta">Telefone para contato:</label>
+      <input type="tel" id="telefoneOferta" placeholder="Digite seu telefone" />
 
-
-      <button id="enviarOferta" class="btn-ofertar">Enviar Oferta</button>
+      <button id="enviarOferta" class="btn-fazer-oferta btn-vd">Enviar Oferta</button>
+      <button id="fecharOferta" class="btn-cz">Cancelar</button>
     </div>
   </div>
 
-  <!-- Modal para visualização de imagem grande -->
+  <!-- Visualizador ampliado da imagem do item -->
   <div id="visualizadorImagem" class="visualizador-imagem hidden">
-    <span class="fechar-visualizador" onclick="fecharVisualizadorImagem()">&times;</span>
-    <img id="imagemAmpliada" src="" alt="Imagem ampliada" />
+    <span class="fechar-visualizador" onclick="fecharVisualizadorImagem()">×</span>
+    <img id="imagemAmpliada" src="" alt="Imagem ampliada do item" />
   </div>
 
+  <!-- Script -->
   <script src="js/detalhes-item.js"></script>
 </body>
 

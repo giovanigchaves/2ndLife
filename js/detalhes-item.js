@@ -1,11 +1,13 @@
-// detalhes-item.js (corrigido e completo)
-
-window.addEventListener("DOMContentLoaded", () => {
+// =============================================
+// INICIALIZAÇÃO AO CARREGAR A PÁGINA
+// =============================================
+document.addEventListener("DOMContentLoaded", () => {
   const item = JSON.parse(sessionStorage.getItem("itemDetalhado"));
   const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
   const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
   const usuario = perfis[emailUsuarioLogado];
 
+  // Se faltar dados essenciais, redireciona para o dashboard
   if (!item || !usuario) {
     window.location.href = "dashboard.html";
     return;
@@ -14,13 +16,16 @@ window.addEventListener("DOMContentLoaded", () => {
   const ehCriador = item.criador.toLowerCase() === usuario.nome.toLowerCase();
 
   preencherDadosItem(item);
-  configurarBotaoFechar();
   carregarImagens(item);
+  configurarBotaoFechar();
   configurarAcoesUsuario(item, usuario, ehCriador);
   configurarExibicaoOfertas(item, usuario, ehCriador);
   configurarFechamentoModalOferta();
 });
 
+// =============================================
+// EXIBE OS DADOS DO ITEM NOS CAMPOS HTML
+// =============================================
 function preencherDadosItem(item) {
   document.getElementById("criadorItem").textContent = item.criador;
   document.getElementById("tituloItem").textContent = item.nome;
@@ -49,22 +54,21 @@ function preencherDadosItem(item) {
     "diasRestantesItem"
   ).textContent = `${diasRestantes} dia${diasRestantes !== 1 ? "s" : ""}`;
 
-  document.getElementById("cidadeItem").textContent =
-    item.endereco?.cidade || "-";
-  document.getElementById("bairroItem").textContent =
-    item.endereco?.bairro || "-";
+  document.getElementById("cepItem").textContent = item.endereco?.cep || "-";
   document.getElementById("ruaItem").textContent = item.endereco?.rua || "-";
   document.getElementById("numeroItem").textContent =
     item.endereco?.numero || "-";
+  document.getElementById("bairroItem").textContent =
+    item.endereco?.bairro || "-";
+  document.getElementById("cidadeItem").textContent =
+    item.endereco?.cidade || "-";
+  document.getElementById("estadoItem").textContent =
+    item.endereco?.estado || "-";
 }
 
-function configurarBotaoFechar() {
-  document.getElementById("fecharPagina").addEventListener("click", () => {
-    const origem = sessionStorage.getItem("origemDetalhes");
-    window.location.href = origem || "dashboard.html";
-  });
-}
-
+// =============================================
+// CARREGA A GALERIA DE IMAGENS DO ITEM
+// =============================================
 function carregarImagens(item) {
   const fotosContainer = document.getElementById("fotosItem");
   fotosContainer.innerHTML = "";
@@ -72,33 +76,47 @@ function carregarImagens(item) {
   const fotos = item.fotos || [];
   if (fotos.length === 0) {
     fotosContainer.innerHTML = "<p>Sem imagens disponíveis.</p>";
-  } else {
-    fotos.forEach((foto) => {
-      const img = document.createElement("img");
-      img.src = foto;
-      img.classList.add("foto-detalhe");
-      img.addEventListener("click", () => abrirVisualizacaoImagem(foto));
-      fotosContainer.appendChild(img);
-    });
+    return;
   }
+
+  fotos.forEach((foto) => {
+    const img = document.createElement("img");
+    img.src = foto;
+    img.classList.add("foto-detalhe");
+    img.addEventListener("click", () => abrirVisualizacaoImagem(foto));
+    fotosContainer.appendChild(img);
+  });
 }
 
+// =============================================
+// CONFIGURA O BOTÃO DE FECHAR PÁGINA
+// =============================================
+function configurarBotaoFechar() {
+  document.getElementById("fecharPagina").addEventListener("click", () => {
+    const origem = sessionStorage.getItem("origemDetalhes");
+    window.location.href = origem || "dashboard.html";
+  });
+}
+
+// =============================================
+// EXIBE OU ESCONDE BOTÕES DE AÇÃO CONFORME PERFIL
+// =============================================
 function configurarAcoesUsuario(item, usuario, ehCriador) {
   const btnEditar = document.getElementById("editarItem");
   const btnExcluir = document.getElementById("excluirItem");
   const container = document.getElementById("botaoOfertaContainer");
 
-  const todasOfertas = JSON.parse(localStorage.getItem("ofertas")) || [];
-  const minhaOferta = todasOfertas.find(
-    (oferta) =>
-      oferta.itemId === item.id &&
-      oferta.interessado.toLowerCase() === usuario.nome.toLowerCase()
+  const ofertas = JSON.parse(localStorage.getItem("ofertas")) || [];
+  const minhaOferta = ofertas.find(
+    (of) =>
+      of.itemId === item.id &&
+      of.interessado.toLowerCase() === usuario.nome.toLowerCase()
   );
 
   const hoje = new Date();
   const dataCadastro = new Date(item.dataCadastro);
   const dataFim = new Date(
-    dataCadastro.getTime() + parseInt(item.duracao) * 24 * 60 * 60 * 1000
+    dataCadastro.getTime() + parseInt(item.duracao) * 86400000
   );
   const expirado = dataFim <= hoje;
 
@@ -110,13 +128,12 @@ function configurarAcoesUsuario(item, usuario, ehCriador) {
     btnEditar.style.display = "none";
     btnExcluir.style.display = "none";
 
-    container.innerHTML = "";
-
     if (!minhaOferta && !expirado) {
       const botao = document.createElement("button");
       botao.textContent = "Fazer uma oferta";
       botao.className = "btn-ofertar";
       botao.addEventListener("click", () => abrirFormularioOferta(item));
+      container.innerHTML = "";
       container.appendChild(botao);
       container.classList.remove("hidden");
     } else {
@@ -127,54 +144,28 @@ function configurarAcoesUsuario(item, usuario, ehCriador) {
   configurarEventosEdicaoExclusao(item);
 }
 
-function exibirResumoOferta(oferta, container) {
-  if (!container.querySelector("h3")) {
-    const titulo = document.createElement("h3");
-    titulo.textContent = "💬 Ofertas Recebidas";
-    container.appendChild(titulo);
-  }
-
-  const resumo = document.createElement("div");
-  resumo.className = "resumo-oferta";
-
-  let texto = "";
-  if (oferta.tipo === "pagarei") {
-    texto = `💸 Você ofertou R$ ${parseFloat(oferta.valor).toFixed(
-      2
-    )} para adquirir este item.`;
-  } else if (oferta.tipo === "cobro") {
-    texto = `🚚 Você propôs cobrar R$ ${parseFloat(oferta.valor).toFixed(
-      2
-    )} para retirar este item.`;
-  } else {
-    texto = `🤝 Você se propôs a retirar este item gratuitamente.`;
-  }
-
-  if (oferta.mensagem) {
-    texto += `<br>📝 <i>Mensagem:</i> "${oferta.mensagem}"`;
-  }
-
-  resumo.innerHTML = texto;
-  container.appendChild(resumo);
-}
-
+// =============================================
+// CONFIGURA EVENTOS DOS BOTÕES EDITAR / EXCLUIR
+// =============================================
 function configurarEventosEdicaoExclusao(item) {
   const btnEditar = document.getElementById("editarItem");
   const btnExcluir = document.getElementById("excluirItem");
-  let confirmandoExclusao = false;
+  let confirmando = false;
 
   btnEditar.addEventListener("click", () => {
     sessionStorage.setItem("itemEmEdicao", JSON.stringify(item));
-    const origemDetalhes = sessionStorage.getItem("origemDetalhes");
-    sessionStorage.setItem("origemEdicao", origemDetalhes || "dashboard.html");
+    sessionStorage.setItem(
+      "origemEdicao",
+      sessionStorage.getItem("origemDetalhes") || "dashboard.html"
+    );
     window.location.href = "cadastro-item.html";
   });
 
   btnExcluir.addEventListener("click", () => {
-    if (!confirmandoExclusao) {
+    if (!confirmando) {
       btnExcluir.textContent = "Confirmar";
       btnExcluir.classList.add("confirmar-apagar");
-      confirmandoExclusao = true;
+      confirmando = true;
     } else {
       let itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
       itens = itens.filter((i) => i.id !== item.id);
@@ -187,20 +178,20 @@ function configurarEventosEdicaoExclusao(item) {
     if (e.target.id !== "excluirItem") {
       btnExcluir.textContent = "Excluir";
       btnExcluir.classList.remove("confirmar-apagar");
-      confirmandoExclusao = false;
+      confirmando = false;
     }
   });
 }
-
-function configurarExibicaoOfertas(item) {
+// =============================================
+// EXIBE A LISTA DE OFERTAS RECEBIDAS OU RESULTADO FINAL
+// =============================================
+function configurarExibicaoOfertas(item, usuario, ehCriador) {
   const container = document.getElementById("ofertasRecebidas");
   const lista = document.getElementById("listaOfertas");
-
   if (!container || !lista) return;
 
   const todasOfertas = JSON.parse(localStorage.getItem("ofertas")) || [];
   const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-
   const ofertasDoItem = todasOfertas.filter(
     (oferta) => oferta.itemId === item.id
   );
@@ -208,79 +199,56 @@ function configurarExibicaoOfertas(item) {
   const hoje = new Date();
   const dataCadastro = new Date(item.dataCadastro);
   const dataFim = new Date(
-    dataCadastro.getTime() + parseInt(item.duracao) * 24 * 60 * 60 * 1000
+    dataCadastro.getTime() + parseInt(item.duracao) * 86400000
   );
-  const expirado = dataFim <= hoje; // 🔥 Controle de expiração
+  const expirado = dataFim <= hoje;
 
   container.classList.remove("hidden");
   lista.innerHTML = "";
 
-  if (expirado) {
-    if (ofertasDoItem.length > 0) {
-      const melhorOferta = ofertasDoItem[0];
+  if (expirado && ofertasDoItem.length > 0) {
+    const melhorOferta = ofertasDoItem[0];
+    const perfilProprietario = perfis[item.emailCriador] || {};
+    const perfilGanhador = perfis[melhorOferta.interessadoEmail] || {};
 
-      // 🎯 Buscar dados de perfil para pegar nomes e telefones
-      const perfilProprietario = perfis[item.emailCriador] || {};
-      const perfilGanhador = perfis[melhorOferta.interessadoEmail] || {};
+    const nomeProprietario = perfilProprietario.nome || "Proprietário";
+    const telefoneProprietario = perfilProprietario.telefone || "Não informado";
+    const nomeGanhador = perfilGanhador.nome || melhorOferta.interessado;
+    const telefoneGanhador = perfilGanhador.telefone || "Não informado";
 
-      const nomeProprietario = perfilProprietario.nome || "Proprietário";
-      const telefoneProprietario =
-        perfilProprietario.telefone || "Não informado";
+    const div = document.createElement("div");
+    div.className = "oferta-recebida";
 
-      const nomeGanhador = perfilGanhador.nome || melhorOferta.interessado;
-      const telefoneGanhador = perfilGanhador.telefone || "Não informado";
+    let texto = `🎉 Parabéns <b>${nomeGanhador}</b>, você já pode retirar o item!<br><br>`;
+    if (melhorOferta.tipo === "pagarei")
+      texto += `💸 Ofereceu R$ ${parseFloat(melhorOferta.valor).toFixed(
+        2
+      )}.<br>`;
+    else if (melhorOferta.tipo === "cobro")
+      texto += `🚚 Cobrou R$ ${parseFloat(melhorOferta.valor).toFixed(2)}.<br>`;
+    else texto += `🤝 Retira gratuitamente.<br>`;
 
-      // 🎉 Cria o container completo
-      const div = document.createElement("div");
-      div.className = "oferta-recebida";
+    if (melhorOferta.mensagem)
+      texto += `📝 <i>Mensagem:</i> "${melhorOferta.mensagem}"<br><br>`;
 
-      let texto = `
-        🎉 Parabéns <b>${nomeGanhador}</b>, você já pode retirar o item!<br><br>
-      `;
+    texto += `📱 Telefone do <b>${nomeProprietario}</b>: <b>${telefoneProprietario}</b><br>
+              📱 Telefone do <b>${nomeGanhador}</b>: <b>${telefoneGanhador}</b><br><br>
+              😉 <b>Combinem a retirada!</b>`;
 
-      if (melhorOferta.tipo === "pagarei") {
-        texto += `💸 <b>${nomeGanhador}</b> ofereceu R$ ${parseFloat(
-          melhorOferta.valor
-        ).toFixed(2)}.<br>`;
-      } else if (melhorOferta.tipo === "cobro") {
-        texto += `🚚 <b>${nomeGanhador}</b> cobrou R$ ${parseFloat(
-          melhorOferta.valor
-        ).toFixed(2)} para retirar.<br>`;
-      } else {
-        texto += `🤝 <b>${nomeGanhador}</b> se propôs a retirar gratuitamente.<br><br>`;
-      }
-
-      if (melhorOferta.mensagem) {
-        texto += `📝 <i>Mensagem:</i> "${melhorOferta.mensagem}"<br><br>`;
-      }
-
-      // 📱 Telefones personalizados com nomes
-      texto += `
-        📱 Telefone de <b>${nomeProprietario}</b> (proprietário): <b>${telefoneProprietario}</b><br><br>
-        📱 Telefone de <b>${nomeGanhador}</b> (novo dono): <b>${telefoneGanhador}</b><br><br>
-      `;
-
-      // Mensagem amigável
-      texto += `
-        😉 <b>Agora é só combinar a retirada do item!</b> 😁
-      `;
-
-      div.innerHTML = texto;
-      lista.appendChild(div);
-    } else {
-      lista.innerHTML = "<p>Nenhuma oferta recebida durante o leilão.</p>";
-    }
+    div.innerHTML = texto;
+    lista.appendChild(div);
   } else {
-    lista.innerHTML = ofertasDoItem.length
-      ? ""
-      : "<p>Nenhuma oferta recebida ainda.</p>";
-
-    ofertasDoItem.forEach((oferta) => {
-      renderizarOferta(oferta, lista);
-    });
+    if (ofertasDoItem.length === 0) {
+      lista.innerHTML = "<p>Nenhuma oferta recebida ainda.</p>";
+    } else {
+      ofertasDoItem.forEach((oferta) => renderizarOferta(oferta, lista));
+    }
   }
 }
 
+// =============================================
+// ABRE O FORMULÁRIO DE OFERTA
+// =============================================
 function abrirFormularioOferta(item) {
   const modal = document.getElementById("modalOferta");
   const tipoSelect = document.getElementById("tipoOferta");
@@ -301,22 +269,21 @@ function abrirFormularioOferta(item) {
     const usuario = perfis[emailUsuarioLogado];
     const perfilUsuario = perfis[usuario.email] || {};
 
-    if (telefoneInput) {
-      telefoneInput.value = perfilUsuario.telefone || "";
-    }
+    if (telefoneInput) telefoneInput.value = perfilUsuario.telefone || "";
 
     tipoSelect.addEventListener("change", () => {
-      if (tipoSelect.value === "pagarei" || tipoSelect.value === "cobro") {
+      if (tipoSelect.value === "pagarei" || tipoSelect.value === "cobro")
         campoValor.classList.remove("hidden");
-      } else {
-        campoValor.classList.add("hidden");
-      }
+      else campoValor.classList.add("hidden");
     });
 
     configurarEnvioOferta(item);
   }
 }
 
+// =============================================
+// ENVIA A OFERTA DO USUÁRIO PARA O ITEM
+// =============================================
 function configurarEnvioOferta(item) {
   const botaoEnviar = document.getElementById("enviarOferta");
   if (!botaoEnviar) return;
@@ -332,20 +299,10 @@ function configurarEnvioOferta(item) {
       .getElementById("telefoneOferta")
       .value.trim();
 
-    if (!tipo) {
-      alert("Selecione o tipo de oferta.");
-      return;
-    }
-
-    if ((tipo === "pagarei" || tipo === "cobro") && !valorInput) {
-      alert("Informe o valor para esta oferta.");
-      return;
-    }
-
-    if (!telefoneOferta) {
-      alert("Por favor, informe seu telefone para contato.");
-      return;
-    }
+    if (!tipo) return alert("Selecione o tipo de oferta.");
+    if ((tipo === "pagarei" || tipo === "cobro") && !valorInput)
+      return alert("Informe o valor.");
+    if (!telefoneOferta) return alert("Informe seu telefone para contato.");
 
     const valor = tipo === "gratis" ? 0 : parseFloat(valorInput);
 
@@ -419,6 +376,9 @@ function configurarEnvioOferta(item) {
   };
 }
 
+// =============================================
+// FECHA O MODAL DE OFERTA
+// =============================================
 function configurarFechamentoModalOferta() {
   const botaoFechar = document.getElementById("fecharOferta");
   const modal = document.getElementById("modalOferta");
@@ -430,6 +390,9 @@ function configurarFechamentoModalOferta() {
   }
 }
 
+// =============================================
+// ABRE VISUALIZAÇÃO AMPLIADA DA IMAGEM
+// =============================================
 function abrirVisualizacaoImagem(fotoUrl) {
   const imagemAmpliada = document.getElementById("imagemAmpliada");
   const visualizador = document.getElementById("visualizadorImagem");
@@ -442,6 +405,9 @@ function abrirVisualizacaoImagem(fotoUrl) {
   }
 }
 
+// =============================================
+// FECHA VISUALIZADOR DE IMAGEM
+// =============================================
 function fecharVisualizadorImagem() {
   const visualizador = document.getElementById("visualizadorImagem");
   const imagemAmpliada = document.getElementById("imagemAmpliada");
@@ -452,26 +418,25 @@ function fecharVisualizadorImagem() {
   }
 }
 
+// =============================================
+// RENDERIZA UMA OFERTA INDIVIDUAL NA LISTA
+// =============================================
 function renderizarOferta(oferta, container) {
   const div = document.createElement("div");
-  div.className = "oferta-recebida"; // Mantemos o mesmo padrão visual
+  div.className = "oferta-recebida";
 
   let texto = "";
-  if (oferta.tipo === "pagarei") {
+  if (oferta.tipo === "pagarei")
     texto = `💸 <b>${oferta.interessado}</b> oferece R$ ${parseFloat(
       oferta.valor
     ).toFixed(2)}.`;
-  } else if (oferta.tipo === "cobro") {
+  else if (oferta.tipo === "cobro")
     texto = `🚚 <b>${oferta.interessado}</b> cobra R$ ${parseFloat(
       oferta.valor
     ).toFixed(2)} para retirar.`;
-  } else {
-    texto = `🤝 <b>${oferta.interessado}</b> se propõe a retirar gratuitamente.`;
-  }
+  else texto = `🤝 <b>${oferta.interessado}</b> retira gratuitamente.`;
 
-  if (oferta.mensagem) {
-    texto += `<br>📝 <i>Mensagem:</i> "${oferta.mensagem}"`;
-  }
+  if (oferta.mensagem) texto += `<br>📝 <i>${oferta.mensagem}</i>`;
 
   div.innerHTML = texto;
   container.appendChild(div);

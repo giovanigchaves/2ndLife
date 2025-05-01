@@ -1,128 +1,119 @@
+// =============================================
+// INICIALIZAÇÃO AO CARREGAR A PÁGINA
+// =============================================
 document.addEventListener("DOMContentLoaded", () => {
-  const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
+  const emailLogado = sessionStorage.getItem("usuarioLogado");
+  if (!emailLogado) return;
+
   const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-  const usuario = perfis[emailUsuarioLogado];
+  const perfil = perfis[emailLogado];
+  if (!perfil) return;
 
-  if (!emailUsuarioLogado) {
-    window.location.href = "login.html";
-    return;
-  }
+  // Preenche dados pessoais
+  document.getElementById("fotoMiniatura").src =
+    perfil.fotoPerfil || "assets/avatar-default.png";
+  document.getElementById("previewFoto").src =
+    perfil.fotoPerfil || "assets/avatar-default.png";
+  document.getElementById("nomeMiniatura").textContent =
+    perfil.nome || "Usuário";
+  document.getElementById("nomePerfil").value = perfil.nome || "";
+  document.getElementById("emailPerfil").value = perfil.email || "";
+  document.getElementById("telefonePerfil").value = perfil.telefone || "";
 
-  const emailUsuario = emailUsuarioLogado;
-  const form = document.getElementById("formPerfil");
-  const preview = document.getElementById("previewFoto");
-  const inputFoto = document.getElementById("fotoPerfil");
-  const perfilAtual = perfis[emailUsuario];
+  // Preenche endereço salvo
+  const end = perfil.endereco || {};
+  document.getElementById("cep").value = end.cep || "";
+  document.getElementById("rua").value = end.rua || "";
+  document.getElementById("numero").value = end.numero || "";
+  document.getElementById("bairro").value = end.bairro || "";
+  document.getElementById("cidade").value = end.cidade || "";
+  document.getElementById("estado").value = end.estado || "";
+});
 
-  // preenche o campo existente, nome e email
-  document.getElementById("nomePerfil").value = usuario?.nome || "";
-  document.getElementById("emailPerfil").value = emailUsuarioLogado || "";
+// =============================================
+// ATUALIZA O PREVIEW DA FOTO DE PERFIL AO SELECIONAR ARQUIVO
+// =============================================
+document.getElementById("fotoPerfil").addEventListener("change", function () {
+  const arquivo = this.files[0];
+  if (!arquivo) return;
 
-  if (perfilAtual) {
-    document.getElementById("nomePerfil").value = perfilAtual.nome || "";
-    document.getElementById("telefonePerfil").value =
-      perfilAtual.telefone || "";
-    document.getElementById("cep").value = perfilAtual.cep || "";
-    document.getElementById("rua").value = perfilAtual.rua || "";
-    document.getElementById("bairro").value = perfilAtual.bairro || "";
-    document.getElementById("numero").value = perfilAtual.numero || "";
-    document.getElementById("cidade").value = perfilAtual.cidade || "";
-    document.getElementById("estado").value = perfilAtual.estado || "";
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    document.getElementById("previewFoto").src = e.target.result;
+    document.getElementById("fotoMiniatura").src = e.target.result;
+  };
+  reader.readAsDataURL(arquivo);
+});
 
-    if (perfilAtual.fotoPerfil) {
-      preview.innerHTML = `<img src="${perfilAtual.fotoPerfil}" class="foto-preview" />`;
-    }
-  }
+// =============================================
+// BUSCA AUTOMÁTICA DO ENDEREÇO COM BASE NO CEP
+// =============================================
+document.getElementById("cep").addEventListener("blur", function () {
+  const cep = this.value.replace(/\D/g, "");
+  if (cep.length !== 8) return;
 
-  // Buscar endereço ao preencher o CEP
-  document.getElementById("cep").addEventListener("blur", async () => {
-    const cep = document.getElementById("cep").value.replace(/\D/g, "");
-    if (cep.length !== 8) return;
+  fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    .then((res) => res.json())
+    .then((dados) => {
+      if (dados.erro) return;
 
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await response.json();
+      document.getElementById("rua").value = dados.logradouro || "";
+      document.getElementById("bairro").value = dados.bairro || "";
+      document.getElementById("cidade").value = dados.localidade || "";
+      document.getElementById("estado").value = dados.uf || "";
+    });
+});
 
-      if (!data.erro) {
-        document.getElementById("rua").value = data.logradouro || "";
-        document.getElementById("bairro").value = data.bairro || "";
-        document.getElementById("cidade").value = data.localidade || "";
-        document.getElementById("estado").value = data.uf || "";
-      }
-    } catch (err) {
-      console.error("Erro ao buscar CEP:", err);
-    }
-  });
+// =============================================
+// SALVA AS INFORMAÇÕES ATUALIZADAS DO PERFIL
+// =============================================
+document.getElementById("formPerfil").addEventListener("submit", function (e) {
+  e.preventDefault();
 
-  // Preview da foto
-  inputFoto.addEventListener("change", () => {
-    const file = inputFoto.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        preview.innerHTML = `<img src="${reader.result}" class="foto-preview" />`;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  const emailLogado = sessionStorage.getItem("usuarioLogado");
+  if (!emailLogado) return;
 
-  // Salvar perfil
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
+  const fotoPreview = document.getElementById("previewFoto").src;
 
-    let fotoPerfilBase64 = perfilAtual?.fotoPerfil || "";
+  const perfilAnterior = perfis[emailLogado] || {};
 
-    const novaFoto = inputFoto.files[0];
-    if (novaFoto) {
-      const reader = new FileReader();
-      fotoPerfilBase64 = await new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(novaFoto);
-      });
-    }
-
-    const dadosAtualizados = {
-      nome: document.getElementById("nomePerfil").value.trim(),
-      telefone: document.getElementById("telefonePerfil").value.trim(),
-      email: perfilAtual?.email || emailUsuario,
-      senha: perfilAtual?.senha || "",
+  perfis[emailLogado] = {
+    ...perfilAnterior, // preserva dados anteriores como a senha
+    nome: document.getElementById("nomePerfil").value.trim(),
+    email: document.getElementById("emailPerfil").value.trim(),
+    telefone: document.getElementById("telefonePerfil").value.trim(),
+    fotoPerfil: fotoPreview,
+    endereco: {
       cep: document.getElementById("cep").value.trim(),
       rua: document.getElementById("rua").value.trim(),
-      bairro: document.getElementById("bairro").value.trim(),
       numero: document.getElementById("numero").value.trim(),
+      bairro: document.getElementById("bairro").value.trim(),
       cidade: document.getElementById("cidade").value.trim(),
       estado: document.getElementById("estado").value.trim(),
-      fotoPerfil: fotoPerfilBase64,
-    };
+    },
+  };
 
-    perfis[emailUsuario] = dadosAtualizados;
-    localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
-
-    // Modal de confirmação (caso queira usar uma)
-    alert("Perfil salvo com sucesso!");
-  });
-
-  if (!usuario) return;
-
-  const foto = document.getElementById("fotoMiniatura");
-  const nome = document.getElementById("nomeMiniatura");
-
-  if (foto && nome) {
-    foto.src = usuario?.fotoPerfil || "assets/avatar-default.png";
-    nome.textContent = usuario?.nome || "";
-  }
+  localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
+  alert("Perfil atualizado com sucesso!");
+  window.location.reload();
 });
+
+// =============================================
+// FUNÇÕES DE NAVEGAÇÃO / MENU
+// =============================================
+function toggleMenu() {
+  const links = document.querySelector(".menu-links");
+  links.classList.toggle("show");
+}
 
 function abrirCadastroNovo() {
   sessionStorage.removeItem("itemEmEdicao");
+  sessionStorage.setItem("origemEdicao", window.location.pathname);
   window.location.href = "cadastro-item.html";
 }
 
 function sair() {
   sessionStorage.removeItem("usuarioLogado");
   window.location.href = "login.html";
-}
-function toggleMenu() {
-  const links = document.querySelector(".menu-links");
-  links.classList.toggle("show");
 }

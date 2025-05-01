@@ -10,25 +10,38 @@
 </head>
 
 <body class="body-login">
-    <div class="container">
-        <!-- Logo -->
+    <div class="container login-container">
+        <!-- Logomarca -->
         <img src="assets/logo2ndLife-2.png" alt="Logo 2ndLife" class="logo-img" />
 
         <p class="slogan">"Dê uma nova vida ao que você já não usa!"</p>
         <h2 class="logo-login">Bem-vindo</h2>
-        <form onsubmit="return loginUsuario()" action="#">
-            <input type="email" id="emailLogin" placeholder="E-mail"  />
-            <input type="password" id="senhaLogin" placeholder="Senha" required />
+
+        <!-- Formulário de login -->
+        <form class="form-login" id="formLogin" autocomplete="off" novalidate>
+            <!-- Campo de email -->
+            <label for="emailLogin">E-mail</label>
+            <input type="email" id="emailLogin" placeholder="Digite seu e-mail" required aria-required="true" />
+
+            <!-- Campo de senha -->
+            <label for="senhaLogin">Senha</label>
+            <input type="password" id="senhaLogin" placeholder="Digite sua senha" required aria-required="true" />
+
+            <!-- Botão de envio -->
             <button type="submit" class="btn-entrar-login btn-vd">Entrar</button>
+
+            <!-- Mensagem de erro ou sucesso -->
             <span id="mensagemLogin" class="mensagem-senha mensagem-login"></span>
         </form>
 
+        <!-- Link de registro -->
         <p class="account-login">
             Não tem conta? <a href="cadastro.html">Crie agora</a>
         </p>
     </div>
 
-    <script src="js/login.js"></script>
+    <!-- Script  -->
+    <script src="js/login.js" defer></script>
 </body>
 
 </html>

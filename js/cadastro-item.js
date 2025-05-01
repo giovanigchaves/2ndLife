@@ -1,57 +1,69 @@
-// ao carregar a pagina
-document.addEventListener("DOMContentLoaded", () => {
-  // obtém usuário logado.
-  const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-  const usuario = perfis[emailUsuarioLogado];
+// ========================================================
+// Inicialização ao carregar a página
+// ========================================================
 
-  // se usuário nao estiver logado redireciona(controle).
+window.addEventListener("DOMContentLoaded", () => {
+  const usuario = getUsuarioAtual();
+
+  // Se não estiver logado, redireciona
   if (!usuario) {
     window.location.href = "login.html";
     return;
   }
-  // obtém os dados do perfil do usuario
-  const perfil = usuario ? perfis[usuario.email] : null;
 
-  // Preenche automaticamente os campos de endereço se já tiver salvo
-  if (
-    usuario &&
-    usuario.cep &&
-    usuario.rua &&
-    usuario.numero &&
-    usuario.bairro &&
-    usuario.cidade &&
-    usuario.estado
-  ) {
-    document.getElementById("cep").value = usuario.cep;
-    document.getElementById("rua").value = usuario.rua;
-    document.getElementById("numero").value = usuario.numero;
-    document.getElementById("bairro").value = usuario.bairro;
-    document.getElementById("cidade").value = usuario.cidade;
-    document.getElementById("estado").value = usuario.estado;
+  preencherTopoComPerfil(usuario);
+  carregarCategorias();
+  configurarModaisDeCategoria();
+  configurarEnderecoViaCEP();
+  configurarUploadDeFotos();
+  configurarFormularioCadastro(usuario);
+
+  const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
+  if (itemEditando) {
+    preencherFormularioParaEdicao(itemEditando);
+  } else {
+    preencherEnderecoDoPerfil(usuario);
   }
+});
 
-  if (usuario && usuario.telefone) {
-    const telefoneInput = document.getElementById("telefoneProprietario");
-    if (telefoneInput) {
-      telefoneInput.value = usuario.telefone;
-    }
-  }
+// ========================================================
+// Utilitários Gerais
+// ========================================================
 
-  // obtém o elemento foto e nome do perfil no html
-  const foto = document.getElementById("fotoMiniatura");
-  const nome = document.getElementById("nomeMiniatura");
+function getUsuarioAtual() {
+  const email = sessionStorage.getItem("usuarioLogado");
+  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
+  return perfis[email] || null;
+}
 
-  if (foto && nome) {
-    foto.src = usuario?.fotoPerfil || "assets/avatar-default.png";
-    nome.textContent = usuario?.nome || "";
-  }
+function preencherTopoComPerfil(usuario) {
+  document.getElementById("fotoMiniatura").src =
+    usuario.fotoPerfil || "assets/avatar-default.png";
+  document.getElementById("nomeMiniatura").textContent =
+    usuario.nome || "Usuário";
+}
 
-  // #####################################################
-  //  Modal de nova categoria (abrir, salvar, fechar)
-  // #####################################################
+function toggleMenu() {
+  const links = document.querySelector(".menu-links");
+  links.classList.toggle("show");
+}
 
-  // obtém os elementos da modal do html
+function sair() {
+  sessionStorage.removeItem("usuarioLogado");
+  window.location.href = "login.html";
+}
+
+function acessarPerfil() {
+  window.location.href = "perfil.html";
+}
+
+// ========================================================
+// Modal: Nova Categoria e Gerenciamento
+// ========================================================
+
+function configurarModaisDeCategoria() {
+  const usuario = getUsuarioAtual();
+
   const btnAbrir = document.getElementById("btnAddCategoria");
   const modal = document.getElementById("modalCategoria");
   const btnFechar = document.getElementById("fecharModalCategoria");
@@ -59,633 +71,155 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputNovaCategoria = document.getElementById("novaCategoria");
   const selectCategoria = document.getElementById("categoriaItem");
 
-  // Garante que todos os elementos existem antes de adicionar os eventos
-  if (
-    btnAbrir &&
-    modal &&
-    btnFechar &&
-    btnSalvar &&
-    inputNovaCategoria &&
-    selectCategoria
-  ) {
-    carregarCategorias();
-
-    // abre modal Nova Categoria
+  if (btnAbrir && modal && inputNovaCategoria) {
     btnAbrir.addEventListener("click", () => {
       inputNovaCategoria.value = "";
       modal.classList.remove("hidden");
     });
+  }
 
-    // fecha modal Nova Categoria
+  if (btnFechar && modal) {
     btnFechar.addEventListener("click", () => {
       modal.classList.add("hidden");
     });
+  }
 
-    // Salva nova categoria registrada
+  if (btnSalvar && inputNovaCategoria && selectCategoria && modal) {
     btnSalvar.addEventListener("click", () => {
-      // obtem a categoria removendo os espaços em branco
       const novaCategoria = inputNovaCategoria.value.trim();
-
-      if (novaCategoria !== "") {
-        salvarNovaCategoria(novaCategoria);
+      if (novaCategoria) {
+        salvarNovaCategoria(novaCategoria, usuario);
         carregarCategorias();
-
-        // seleciona categoria criada
         selectCategoria.value = novaCategoria.toLowerCase();
-
         modal.classList.add("hidden");
       }
     });
   }
 
-  // #####################################################
-  //  Geremciar Categorias
-  // #####################################################
-
-  // obtém os elementos da modal do html
   const btnGerenciar = document.getElementById("btnGerenciarCategorias");
-  const btnEditar = document.getElementById("editarCategoria");
-  const btnApagar = document.getElementById("apagarCategoria");
-  const btnConfirmarEdicao = document.getElementById("confirmarEdicao");
   const modalGerenciar = document.getElementById("modalGerenciar");
   const fecharGerenciar = document.getElementById("fecharGerenciarModal");
   const listaCategorias = document.getElementById("listaCategorias");
   const editarBox = document.getElementById("editarBox");
   const inputNovoNome = document.getElementById("novoNomeCategoria");
+  const btnEditar = document.getElementById("editarCategoria");
+  const btnConfirmarEdicao = document.getElementById("confirmarEdicao");
+  const btnApagar = document.getElementById("apagarCategoria");
   const mensagemCategoria = document.getElementById("mensagemCategoria");
 
-  // deixa a mensagem de confirmaçao em branco
-  mensagemCategoria.textContent = "";
-
-  // se existirem os elementos html
-  if (btnGerenciar && modalGerenciar && fecharGerenciar && listaCategorias) {
-    // obtem o elemento da modal nova categoria
-    const modalNovaCategoria = document.getElementById("modalCategoria");
-
-    // se clicar no botao gerenciar categoria
+  if (btnGerenciar && modalGerenciar) {
     btnGerenciar.addEventListener("click", () => {
-      // deixa a mensagem de confirmaçao em branco
-      mensagemCategoria.textContent = "";
+      atualizarListaGerenciar(usuario);
 
-      // oculta a modal nova categoria.
-      if (
-        modalNovaCategoria &&
-        !modalNovaCategoria.classList.contains("hidden")
-      ) {
-        modalNovaCategoria.classList.add("hidden");
+      // Oculta a modal de nova categoria
+      const modalCategoria = document.getElementById("modalCategoria");
+      if (modalCategoria) {
+        modalCategoria.classList.add("hidden");
       }
 
-      // atualiza as categorias no option (com filtro).
-      atualizarListaGerenciar();
-
-      //exibe a modal gerenciar categorias
+      // Mostra a modal de gerenciamento
       modalGerenciar.classList.remove("hidden");
-    });
 
-    // Quando o usuário trocar a categoria selecionada, limpa o campo de edição
-    listaCategorias.addEventListener("change", () => {
-      editarBox.classList.add("hidden"); // esconde o bloco de edição
-      inputNovoNome.value = ""; // limpa o input de texto editar cat.
+      editarBox.classList.add("hidden");
+      inputNovoNome.value = "";
+      mensagemCategoria.textContent = "";
     });
+  }
 
-    // fecha modal gerenciar categoria
+  if (fecharGerenciar && modalGerenciar) {
     fecharGerenciar.addEventListener("click", () => {
       modalGerenciar.classList.add("hidden");
-      editarBox.classList.add("hidden");
-      carregarCategorias(); // atualiza a lista de categorias no option
     });
+  }
 
-    // ao clicar no botao editar categoria, exibe o input para edição.
+  // 1. Clique no botão EDITAR → mostra o input e botão Confirmar
+  if (btnEditar && editarBox && inputNovoNome) {
     btnEditar.addEventListener("click", () => {
-      // obtem a categoria selecionada
       const selecionada = listaCategorias.value;
+      if (!selecionada) return;
 
       inputNovoNome.value = selecionada;
       editarBox.classList.remove("hidden");
     });
+  }
 
-    // atualiza o nome da categoria editado.
+  // 2. Clique no botão CONFIRMAR → edita a categoria e oculta campos
+  if (btnConfirmarEdicao && inputNovoNome && editarBox) {
     btnConfirmarEdicao.addEventListener("click", () => {
-      // obtem o nome editado da categoria
       const novoNome = inputNovoNome.value.trim();
-      // obtem o nome antigo
       const antigo = listaCategorias.value;
+      const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
 
-      if (novoNome && antigo) {
-        // obtem as categorias existentes em localStorage
-        let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+      if (!novoNome) return;
 
-        // verifica se existe outra categoria com o mesmo nome.
-        const cat = categorias.find((c) => c.nome === novoNome);
+      if (categorias.find((c) => c.nome === novoNome)) {
+        mensagemCategoria.textContent = `O nome ${novoNome} já existe.`;
+        return;
+      }
 
-        // se existir envia uma mensagem
-        if (cat) {
-          mensagemCategoria.textContent = `Lamento ${usuario.nome} o nome ${novoNome} ja esta em uso!`;
-          return;
-        }
+      const index = categorias.findIndex((c) => c.nome === antigo);
+      if (index >= 0) {
+        categorias[index].nome = novoNome;
+        localStorage.setItem("categorias", JSON.stringify(categorias));
+        carregarCategorias();
+        atualizarListaGerenciar(usuario);
 
-        // obtem o index (posição no arrey do item a ser alterado) da categoria
-        const index = categorias.findIndex((cat) => cat.nome === antigo);
-
-        // se encontrar o item a ser alterado (antigo)
-        if (index > -1) {
-          categorias[index].nome = novoNome; //atribui o novo nome
-          localStorage.setItem("categorias", JSON.stringify(categorias));
-          atualizarListaGerenciar();
-          editarBox.classList.add("hidden");
-          inputNovoNome.value = "";
-          carregarCategorias(); // Atualiza o select (categoias) da tela principal.
-        }
+        // Oculta os campos novamente
+        inputNovoNome.value = "";
+        editarBox.classList.add("hidden");
+        mensagemCategoria.textContent = "";
       }
     });
+  }
 
-    // apagar um categoria
-    // variavel para confirmaçao de exclusao.
-    let confirmandoExclusao = false;
+  let confirmandoExclusao = false;
 
+  if (btnApagar) {
     btnApagar.addEventListener("click", () => {
-      // obtem usuario logado
-      const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-      const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-      const usuario = perfis[emailUsuarioLogado];
+      const categoriaSelecionada = listaCategorias.value;
+      if (!categoriaSelecionada) return;
 
-      // obtem a categoria selecionada
-      const categoria = listaCategorias.value;
-
-      // obtem as categorias de localStorage
-      let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
-
-      // altera o nome do botao apagar para Confirmar
+      // Primeiro clique - habilita confirmação
       if (!confirmandoExclusao) {
         btnApagar.textContent = "Confirmar";
         btnApagar.classList.add("confirmar-apagar");
         confirmandoExclusao = true;
-
-        // se foi clicado em Confirmar
-      } else {
-        // obtem todos as categorias menos a antiga
-        categorias = categorias.filter((c) => c.nome !== categoria);
-        // adiciona as categorias atualizadas em localStorage
-        localStorage.setItem("categorias", JSON.stringify(categorias));
-
-        atualizarListaGerenciar();
-        carregarCategorias();
-
-        editarBox.classList.add("hidden");
-        confirmandoExclusao = false;
-        btnApagar.textContent = "Apagar";
-        btnApagar.classList.remove("confirmar-apagar");
-        mensagemCategoria.textContent = "";
-      }
-    });
-
-    // Cancela o estado de confirmação se clicar no botao editar
-    btnEditar.addEventListener("click", () => {
-      confirmandoExclusao = false;
-      btnApagar.textContent = "Apagar";
-      btnApagar.classList.remove("confirmar-apagar");
-    });
-
-    // Cancela o estado de confirmação se clicar no botao fechar modal
-    fecharGerenciar.addEventListener("click", () => {
-      confirmandoExclusao = false;
-      btnApagar.textContent = "Apagar";
-      btnApagar.classList.remove("confirmar-apagar");
-    });
-
-    // Cancela o estado de confirmação se clicar no select de categorias
-    listaCategorias.addEventListener("click", () => {
-      confirmandoExclusao = false;
-      btnApagar.textContent = "Apagar";
-      btnApagar.classList.remove("confirmar-apagar");
-    });
-  }
-
-  // #####################################################
-  //  Preenche o formulário se estiver editando um item (MODO EDIÇÃO)
-  // #####################################################
-
-  // Garante que as categorias sejam carregadas antes
-  carregarCategorias();
-
-  // --------------------------------------------------------------------------
-
-  const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
-  const botaoCadastroItem = document.getElementById("botaoCadastroItem"); // NOVO
-
-  // Torna global para usar no restante do código
-  window.fotosAntigas = [];
-
-  if (itemEditando) {
-    // Aguarda o carregamento do select de categoria
-    setTimeout(() => {
-      document.getElementById("categoriaItem").value =
-        itemEditando.categoria.toLowerCase();
-    }, 100);
-
-    document.getElementById("nomeItem").value = itemEditando.nome;
-    document.getElementById("descricaoItem").value = itemEditando.descricao;
-    document.getElementById("duracaoOferta").value = parseInt(
-      itemEditando.duracao
-    );
-    document.getElementById("quantidadeItem").value =
-      itemEditando.quantidade || 1;
-
-    // Alterar título e botão
-    const titulo = document.querySelector(".logo");
-    const botao = document.querySelector(".btn-cadastro");
-    if (titulo) titulo.textContent = "Editar Item";
-    if (botao) botao.textContent = "Salvar Alterações";
-
-    // ALTERAR O TEXTO DO BOTÃO
-    if (botaoCadastroItem) {
-      botaoCadastroItem.textContent = "Salvar Alterações";
-    }
-
-    // Se houver fotos antigas
-    if (itemEditando.fotos && itemEditando.fotos.length > 0) {
-      window.fotosAntigas = [...itemEditando.fotos];
-
-      // Mostrar pré-visualização
-      const previewContainer = document.getElementById("previewFotosEdicao");
-      previewContainer.innerHTML = "";
-
-      window.fotosAntigas.forEach((foto) => {
-        const fotoDiv = document.createElement("div");
-        fotoDiv.classList.add("foto-preview");
-
-        const img = document.createElement("img");
-        img.src = foto;
-
-        const btnRemover = document.createElement("button");
-        btnRemover.classList.add("btn-remover-foto");
-        btnRemover.textContent = "x";
-
-        // Evento de remover foto antiga
-        btnRemover.addEventListener("click", () => {
-          window.fotosAntigas = window.fotosAntigas.filter((f) => f !== foto);
-          fotoDiv.remove();
-        });
-
-        fotoDiv.appendChild(img);
-        fotoDiv.appendChild(btnRemover);
-        previewContainer.appendChild(fotoDiv);
-
-        previewContainer.style.display = "flex";
-      });
-
-      // Se tem foto antiga, tira o required
-      const fotosInput = document.getElementById("fotosItem");
-      if (fotosInput && fotosInput.hasAttribute("required")) {
-        fotosInput.removeAttribute("required");
-      }
-    }
-  }
-
-  // Adiciona o evento de fotos
-  const fotosInput = document.getElementById("fotosItem");
-  if (fotosInput) {
-    fotosInput.addEventListener("change", () => {
-      configurarCampoFotos(fotosInput);
-    });
-  }
-
-  // #####################################################
-  //  Salvar item cadastrado
-  // #####################################################
-
-  //obtem todo o formulario
-  const formCadastroItem = document.getElementById("formCadastroItem");
-
-  if (formCadastroItem) {
-    formCadastroItem.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const nomeItem = document.getElementById("nomeItem").value.trim();
-      const descricaoItem = document
-        .getElementById("descricaoItem")
-        .value.trim();
-
-      const quantidade = parseInt(
-        document.getElementById("quantidadeItem").value
-      );
-
-      const categoria = document.getElementById("categoriaItem").value;
-
-      const fotosInput = document.getElementById("fotosItem");
-      const arquivos = Array.from(fotosInput.files);
-
-      const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-      const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-      const usuario = perfis[emailUsuarioLogado];
-
-      const nomeCriador = usuario?.nome || "Desconhecido";
-
-      const dias = parseInt(document.getElementById("duracaoOferta").value);
-      const duracao = dias === 1 ? "1 Dia" : `${dias} Dias`;
-
-      // Endereço sempre manual
-      const enderecoFinal = {
-        cep: document.getElementById("cep").value.trim(),
-        rua: document.getElementById("rua").value.trim(),
-        bairro: document.getElementById("bairro").value.trim(),
-        numero: document.getElementById("numero").value.trim(),
-        cidade: document.getElementById("cidade").value.trim(),
-        estado: document.getElementById("estado").value.trim(),
-      };
-
-      // Validação dos campos
-      const enderecoIncompleto = Object.values(enderecoFinal).some((v) => !v);
-      if (enderecoIncompleto) {
-        const modalConfirmacao = document.querySelector(
-          ".modal-acao.modal-confirmacao"
-        );
-        const textoModal = modalConfirmacao.querySelector("p");
-        textoModal.textContent =
-          "Por favor, preencha todos os campos de endereço.";
-        modalConfirmacao.classList.remove("hidden");
-        modalConfirmacao.classList.add("show");
-
-        setTimeout(() => {
-          modalConfirmacao.classList.remove("show");
-          modalConfirmacao.classList.add("hidden");
-        }, 2000);
-
         return;
       }
 
-      // Converter fotos em base64
-      const converterBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      };
-      const fotosBase64 = await Promise.all(arquivos.map(converterBase64));
-      const fotosFinal = (window.fotosAntigas || []).concat(fotosBase64);
-      const telefoneProprietario = document
-        .getElementById("telefoneProprietario")
-        .value.trim();
+      // Segundo clique - executa exclusão
+      let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+      categorias = categorias.filter((c) => c.nome !== categoriaSelecionada);
+      localStorage.setItem("categorias", JSON.stringify(categorias));
 
-      // montando como deve ser salvo no json
-      const item = {
-        id: gerarIdUnico(),
-        nome: nomeItem,
-        descricao: descricaoItem,
-        quantidade,
-        categoria,
-        duracao,
-        fotos: fotosFinal,
-        dataCadastro: new Date().toISOString(),
-        criador: nomeCriador,
-        emailCriador: usuario.email,
-        telefoneCriador: telefoneProprietario,
-        endereco: enderecoFinal,
-      };
+      carregarCategorias(); // atualiza select principal
+      atualizarListaGerenciar(usuario); // atualiza select da modal
 
-      // Atualizar telefone e endereço diretamente no usuario
-      usuario.telefone = telefoneProprietario;
-      usuario.cep = enderecoFinal.cep;
-      usuario.rua = enderecoFinal.rua;
-      usuario.numero = enderecoFinal.numero;
-      usuario.bairro = enderecoFinal.bairro;
-      usuario.cidade = enderecoFinal.cidade;
-      usuario.estado = enderecoFinal.estado;
-
-      // Atualizar o localStorage perfisUsuarios
-      perfis[emailUsuarioLogado] = usuario;
-      localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
-
-      // Buscar itens existentes e salvar o novo
-      const itensExistentes = JSON.parse(
-        localStorage.getItem("itensCadastrados") || "[]"
-      );
-
-      const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
-
-      // Verifica se há pelo menos uma imagem (nova ou antiga)
-      const fotosAntigas = window.fotosAntigas || [];
-
-      if (arquivos.length === 0 && fotosAntigas.length === 0) {
-        const modalConfirmacao = document.querySelector(
-          ".modal-acao.modal-confirmacao"
-        );
-        const textoModal = modalConfirmacao.querySelector("p");
-        textoModal.textContent =
-          "É necessário cadastrar pelo menos uma imagem para o item.";
-        modalConfirmacao.classList.remove("hidden");
-        modalConfirmacao.classList.add("show");
-
-        setTimeout(() => {
-          modalConfirmacao.classList.remove("show");
-          modalConfirmacao.classList.add("hidden");
-        }, 2000);
-        return; // Impede o envio do formulário
-      }
-
-      // nao permite que na ediçao seja salvo sem imagem
-      if (
-        arquivos.length === 0 &&
-        (!window.fotosAntigas || window.fotosAntigas.length === 0)
-      ) {
-        const modalConfirmacao = document.querySelector(
-          ".modal-acao.modal-confirmacao"
-        );
-        const textoModal = modalConfirmacao.querySelector("p");
-        textoModal.textContent =
-          "É necessário cadastrar pelo menos uma imagem para o item.";
-        modalConfirmacao.classList.remove("hidden");
-        modalConfirmacao.classList.add("show");
-
-        setTimeout(() => {
-          modalConfirmacao.classList.remove("show");
-          modalConfirmacao.classList.add("hidden");
-        }, 2000);
-        return; // Impede o envio do formulário
-      }
-
-      if (itemEditando) {
-        const index = itensExistentes.findIndex(
-          (i) =>
-            i.nome === itemEditando.nome && i.criador === itemEditando.criador
-        );
-        if (index !== -1) {
-          item.dataCadastro = itemEditando.dataCadastro; // mantém data original
-          item.id = itemEditando.id; // mantém o id original
-          itensExistentes[index] = item;
-        }
-        sessionStorage.removeItem("itemEmEdicao");
-      } else {
-        itensExistentes.push(item);
-      }
-
-      localStorage.setItem("itensCadastrados", JSON.stringify(itensExistentes));
-
-      // exibe modal confirmaçao
-      const modalConfirmacao = document.querySelector(".modal-confirmacao");
-
-      // Atualiza a mensagem do modal dinamicamente
-      const textoModal = modalConfirmacao.querySelector("p");
-      if (itemEditando) {
-        textoModal.textContent = "Item atualizado com sucesso!";
-      } else {
-        textoModal.textContent = "Item cadastrado com sucesso!";
-      }
-
-      modalConfirmacao.classList.add("show");
-      modalConfirmacao.classList.remove("hidden");
-
-      setTimeout(() => {
-        modalConfirmacao.classList.remove("show");
-        modalConfirmacao.classList.add("hidden");
-
-        const origem = sessionStorage.getItem("origemEdicao");
-        sessionStorage.removeItem("origemEdicao");
-        window.location.href = origem || "dashboard.html";
-      }, 1000);
-
-      // Resetar formulário
-      e.target.reset();
+      // Resetar estado da interface
+      editarBox.classList.add("hidden");
+      inputNovoNome.value = "";
+      confirmandoExclusao = false;
+      btnApagar.textContent = "Apagar";
+      btnApagar.classList.remove("confirmar-apagar");
+      mensagemCategoria.textContent = "";
     });
   }
-
-  // #####################################################
-  //  Carregar dados no formulário se estiver editando
-  // #####################################################
-
-  if (itemEditando) {
-    document.getElementById("nomeItem").value = itemEditando.nome;
-    document.getElementById("descricaoItem").value = itemEditando.descricao;
-    document.getElementById("categoriaItem").value =
-      itemEditando.categoria.toLowerCase();
-    document.getElementById("duracaoOferta").value = parseInt(
-      itemEditando.duracao
-    );
-    document.getElementById("quantidadeItem").value =
-      itemEditando.quantidade || 1;
-
-    // Preenche ENDEREÇO do item (não do perfil)
-    document.getElementById("cep").value = itemEditando.endereco?.cep || "";
-    document.getElementById("cidade").value =
-      itemEditando.endereco?.cidade || "";
-    document.getElementById("bairro").value =
-      itemEditando.endereco?.bairro || "";
-    document.getElementById("rua").value = itemEditando.endereco?.rua || "";
-    document.getElementById("numero").value =
-      itemEditando.endereco?.numero || "";
-    document.getElementById("estado").value =
-      itemEditando.endereco?.estado || "";
-
-    // Altera título e botão
-    const titulo = document.querySelector(".logo");
-    const botao = document.querySelector(".btn-cadastro");
-    if (titulo) titulo.textContent = "Editar Item";
-    if (botao) botao.textContent = "Salvar Alterações";
-  } else {
-    // ENDEREÇO DO PERFIL (novo item)
-    const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-    const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-    const usuario = perfis[emailUsuarioLogado];
-    const perfilUsuario = perfis[usuario?.email] || {};
-
-    const enderecoUsuario = {
-      cep: perfilUsuario.cep || "",
-      rua: perfilUsuario.rua || "",
-      numero: perfilUsuario.numero || "",
-      bairro: perfilUsuario.bairro || "",
-      cidade: perfilUsuario.cidade || "",
-      estado: perfilUsuario.estado || "",
-    };
-
-    // Preenche os campos de endereço se não estiver editando um item
-    const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
-
-    if (!itemEditando) {
-      if (enderecoUsuario.cep)
-        document.getElementById("cep").value = enderecoUsuario.cep;
-      if (enderecoUsuario.rua)
-        document.getElementById("rua").value = enderecoUsuario.rua;
-      if (enderecoUsuario.numero)
-        document.getElementById("numero").value = enderecoUsuario.numero;
-      if (enderecoUsuario.bairro)
-        document.getElementById("bairro").value = enderecoUsuario.bairro;
-      if (enderecoUsuario.cidade)
-        document.getElementById("cidade").value = enderecoUsuario.cidade;
-      if (enderecoUsuario.estado)
-        document.getElementById("estado").value = enderecoUsuario.estado;
-    }
-  }
-});
-
-// Carrega categorias no select de categoria
-function carregarCategorias() {
-  // obtém o elemento da categoria do html
-  const selectCategoria = document.getElementById("categoriaItem");
-
-  // se NAO existir o html de categorias sai da função.
-  if (!selectCategoria) return;
-
-  // obtem as categorias de localStorage
-  const categoriasSalvas = JSON.parse(localStorage.getItem("categorias")) || [];
-
-  // Limpa o select (menos a primeira opção "Selecione")
-  selectCategoria.innerHTML = '<option value="">Selecione</option>';
-
-  // preenche o option categoria
-  categoriasSalvas.forEach((cat) => {
-    const option = document.createElement("option");
-    option.value = cat.nome.toLowerCase();
-    option.textContent = cat.nome;
-    selectCategoria.appendChild(option);
-  });
 }
 
-// Salva nova categoria no localStorage se não existir ainda
-function salvarNovaCategoria(novaCategoria) {
-  // obtem as categorias existentes.
-  let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
-
-  // Evita duplicadas (case-insensitive)
-  const existe = categorias.some(
-    (cat) => cat.nome.toLowerCase() === novaCategoria.toLowerCase()
-  );
-
-  // se categoria nao existir insere
-  if (!existe) {
-    const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-    const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-    const usuario = perfis[emailUsuarioLogado];
-    const novaCategoriaObj = {
-      nome: novaCategoria,
-      criador: usuario.email,
-    };
-
-    // adiciona categoria no final da fila
-    categorias.push(novaCategoriaObj);
-    // atualiza categorias em localStorage
-    localStorage.setItem("categorias", JSON.stringify(categorias));
-  }
-}
-
-// atualiza lista de categorias
-function atualizarListaGerenciar() {
-  // obtem usuario logado
-  const emailUsuarioLogado = sessionStorage.getItem("usuarioLogado");
-  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
-  const usuario = perfis[emailUsuarioLogado];
-
-  // obtem as categorias existentes
+function atualizarListaGerenciar(usuario) {
+  const listaCategorias = document.getElementById("listaCategorias");
   const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+  const itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
 
-  // apaga o html existente na lista de categorias
-  listaCategorias.innerHTML = "";
+  listaCategorias.innerHTML = ""; // limpa o select
 
-  // insere uma nova lista de categorias (com filtro)
   categorias.forEach((cat) => {
-    // Exibe apenas se foi criada pelo usuário logado E não estiver em uso
-    if (cat.criador === usuario.email && !categoriaEmUso(cat.nome)) {
+    const criadaPeloUsuario = cat.criador === usuario.email;
+    const estaEmUso = itens.some(
+      (item) => item.categoria.toLowerCase() === cat.nome.toLowerCase()
+    );
+
+    if (criadaPeloUsuario && !estaEmUso) {
       const opt = document.createElement("option");
       opt.value = cat.nome;
       opt.textContent = cat.nome;
@@ -694,86 +228,318 @@ function atualizarListaGerenciar() {
   });
 }
 
-// Verifica se uma categoria está sendo usada em algum item
-function categoriaEmUso(nomeCategoria) {
-  // obtem todos os itens cadastrados
-  const itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
+// ========================================================
+// Categorias - Carregamento e Armazenamento
+// ========================================================
 
-  // verifica se a categoria esta em uso por algum item.
-  return itens.some(
-    (item) => item.categoria.toLowerCase() === nomeCategoria.toLowerCase()
+function carregarCategorias() {
+  const select = document.getElementById("categoriaItem");
+  if (!select) return;
+
+  const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+  select.innerHTML = '<option value="">Categoria</option>';
+
+  categorias.forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat.nome.toLowerCase();
+    option.textContent = cat.nome;
+    select.appendChild(option);
+  });
+}
+
+function salvarNovaCategoria(novaCategoria, usuario) {
+  const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+  const existe = categorias.some(
+    (cat) => cat.nome.toLowerCase() === novaCategoria.toLowerCase()
   );
-}
-
-// Função para configurar o campo de fotos
-function configurarCampoFotos(fotosInput) {
-  const previewContainer = document.getElementById("previewFotosEdicao");
-
-  // Limpa as prévias de fotos anteriores
-  previewContainer.innerHTML = "";
-
-  if (fotosInput.files.length === 0) {
-    previewContainer.style.display = "none"; // 🔥 Esconde se não tiver arquivo
-    return;
-  }
-
-  previewContainer.style.display = "flex"; // 🔥 Mostra quando tem arquivo
-
-  // Exibe prévia das novas fotos
-  for (const foto of fotosInput.files) {
-    const fotoDiv = document.createElement("div");
-    fotoDiv.classList.add("foto-preview");
-
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(foto);
-    fotoDiv.appendChild(img);
-
-    previewContainer.appendChild(fotoDiv);
+  if (!existe) {
+    categorias.push({ nome: novaCategoria, criador: usuario.email });
+    localStorage.setItem("categorias", JSON.stringify(categorias));
   }
 }
 
-// funcao sair
-function sair() {
-  sessionStorage.removeItem("usuarioLogado");
-  window.location.href = "login.html";
-}
+// ========================================================
+// Endereço - Auto-preenchimento via CEP (viacep API)
+// ========================================================
 
-// Acessar Perfil
-function acessarPerfil() {
-  window.location.href = "perfil.html";
-}
+function configurarEnderecoViaCEP() {
+  const cepInput = document.getElementById("cep");
+  if (!cepInput) return;
 
-document.getElementById("cep")?.addEventListener("blur", async () => {
-  const cep = document.getElementById("cep").value.replace(/\D/g, "");
-  if (cep.length !== 8) return;
+  cepInput.addEventListener("blur", async () => {
+    const cep = cepInput.value.replace(/\D/g, "");
+    if (cep.length !== 8) return;
 
-  try {
-    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const data = await response.json();
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
 
-    if (!data.erro) {
-      document.getElementById("rua").value = data.logradouro || "";
-      document.getElementById("bairro").value = data.bairro || "";
-      document.getElementById("cidade").value = data.localidade || "";
-      document.getElementById("estado").value = data.uf || "";
+      if (!data.erro) {
+        document.getElementById("rua").value = data.logradouro || "";
+        document.getElementById("bairro").value = data.bairro || "";
+        document.getElementById("cidade").value = data.localidade || "";
+        document.getElementById("estado").value = data.uf || "";
+      }
+    } catch (err) {
+      console.error("Erro ao buscar CEP:", err);
     }
-  } catch (err) {
-    console.error("Erro ao buscar CEP:", err);
+  });
+}
+
+// ========================================================
+// Upload de Fotos com pré-visualização
+// ========================================================
+
+function configurarUploadDeFotos() {
+  const fotosInput = document.getElementById("fotosItem");
+  if (!fotosInput) return;
+
+  fotosInput.addEventListener("change", () => {
+    const container = document.getElementById("previewFotosEdicao");
+    container.innerHTML = "";
+
+    if (fotosInput.files.length === 0) {
+      container.style.display = "none";
+      return;
+    }
+
+    container.style.display = "flex";
+    Array.from(fotosInput.files).forEach((file) => {
+      const fotoDiv = document.createElement("div");
+      fotoDiv.classList.add("foto-preview");
+
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+
+      fotoDiv.appendChild(img);
+      container.appendChild(fotoDiv);
+    });
+  });
+}
+
+// ========================================================
+// Formulário - Cadastro de novo item
+// ========================================================
+
+function configurarFormularioCadastro(usuario) {
+  const form = document.getElementById("formCadastroItem");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const item = await montarObjetoItem(usuario);
+    if (!item) return;
+
+    const itens = JSON.parse(localStorage.getItem("itensCadastrados")) || [];
+    const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
+
+    if (itemEditando) {
+      const index = itens.findIndex((i) => i.id === itemEditando.id);
+      if (index !== -1) {
+        item.id = itemEditando.id;
+        item.dataCadastro = itemEditando.dataCadastro;
+        itens[index] = item;
+      }
+      sessionStorage.removeItem("itemEmEdicao");
+    } else {
+      item.id = gerarIdUnico();
+      item.dataCadastro = new Date().toISOString();
+      itens.push(item);
+    }
+
+    localStorage.setItem("itensCadastrados", JSON.stringify(itens));
+    atualizarPerfilComEndereco();
+    const mensagem = itemEditando
+      ? "Item editado com sucesso!"
+      : "Item cadastrado com sucesso!";
+    alert(mensagem);
+
+    const destino = itemEditando
+      ? sessionStorage.getItem("origemEdicao") || "dashboard.html"
+      : "dashboard.html";
+
+    // limpar origem se for edição
+    sessionStorage.removeItem("origemEdicao");
+    sessionStorage.removeItem("itemEmEdicao");
+
+    // redirecionar
+    setTimeout(() => {
+      window.location.href = destino;
+    }, 500);
+  });
+}
+
+// ========================================================
+// Montagem do objeto do item com validações
+// ========================================================
+
+async function montarObjetoItem(usuario) {
+  const fotosInput = document.getElementById("fotosItem");
+  const arquivos = Array.from(fotosInput.files);
+  let fotosBase64 = [];
+
+  if (arquivos.length > 0) {
+    fotosBase64 = await Promise.all(arquivos.map(converterBase64));
+  } else {
+    // Se estiver editando e não enviou novas fotos, preserva as antigas
+    const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
+    if (itemEditando && Array.isArray(itemEditando.fotos)) {
+      fotosBase64 = itemEditando.fotos;
+    }
   }
-});
+
+  const endereco = {
+    cep: document.getElementById("cep").value.trim(),
+    rua: document.getElementById("rua").value.trim(),
+    bairro: document.getElementById("bairro").value.trim(),
+    numero: document.getElementById("numero").value.trim(),
+    cidade: document.getElementById("cidade").value.trim(),
+    estado: document.getElementById("estado").value.trim(),
+  };
+
+  if (Object.values(endereco).some((v) => !v)) {
+    exibirModalConfirmacao("Por favor, preencha todos os campos de endereço.");
+    return null;
+  }
+
+  const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
+
+  // Valida imagem apenas se for cadastro
+  if (!itemEditando && arquivos.length === 0) {
+    exibirModalConfirmacao("É necessário cadastrar pelo menos uma imagem.");
+    return null;
+  }
+
+  return {
+    nome: document.getElementById("nomeItem").value.trim(),
+    descricao: document.getElementById("descricaoItem").value.trim(),
+    categoria: document.getElementById("categoriaItem").value,
+    quantidade: parseInt(document.getElementById("quantidadeItem").value),
+    duracao: parseInt(document.getElementById("duracaoOferta").value),
+    fotos: fotosBase64,
+    emailCriador: usuario.email,
+    telefoneCriador: document
+      .getElementById("telefoneProprietario")
+      .value.trim(),
+    endereco,
+    criador: usuario.nome,
+  };
+}
+
+// ========================================================
+// Edição de item - preenchimento automático do formulário
+// ========================================================
+
+function preencherFormularioParaEdicao(item) {
+  document.getElementById("nomeItem").value = item.nome;
+  document.getElementById("descricaoItem").value = item.descricao;
+  document.getElementById("categoriaItem").value = item.categoria.toLowerCase();
+  document.getElementById("quantidadeItem").value = item.quantidade;
+  document.getElementById("duracaoOferta").value = parseInt(item.duracao);
+
+  document.getElementById("cep").value = item.endereco?.cep || "";
+  document.getElementById("rua").value = item.endereco?.rua || "";
+  document.getElementById("numero").value = item.endereco?.numero || "";
+  document.getElementById("bairro").value = item.endereco?.bairro || "";
+  document.getElementById("cidade").value = item.endereco?.cidade || "";
+  document.getElementById("estado").value = item.endereco?.estado || "";
+  document.getElementById("telefoneProprietario").value =
+    item.telefoneCriador || "";
+
+  const titulo = document.querySelector(".logo");
+  const botao = document.getElementById("botaoCadastroItem");
+  if (titulo) titulo.textContent = "Editar Item";
+  if (botao) botao.textContent = "Salvar Alterações";
+
+  const container = document.getElementById("previewFotosEdicao");
+  container.innerHTML = "";
+
+  if (item.fotos?.length > 0) {
+    item.fotos.forEach((foto) => {
+      const div = document.createElement("div");
+      div.classList.add("foto-preview");
+
+      const img = document.createElement("img");
+      img.src = foto;
+
+      div.appendChild(img);
+      container.appendChild(div);
+    });
+  }
+
+  // REMOVE 'required' do input de fotos ao editar
+  const inputFotos = document.getElementById("fotosItem");
+  if (inputFotos) {
+    inputFotos.removeAttribute("required");
+  }
+}
+
+function preencherEnderecoDoPerfil(usuario) {
+  const endereco = usuario.endereco || {};
+  const campos = ["cep", "rua", "numero", "bairro", "cidade", "estado"];
+  campos.forEach((campo) => {
+    if (endereco[campo]) {
+      document.getElementById(campo).value = endereco[campo];
+    }
+  });
+
+  if (usuario.telefone) {
+    document.getElementById("telefoneProprietario").value = usuario.telefone;
+  }
+}
+
+function atualizarPerfilComEndereco() {
+  const emailUsuario = sessionStorage.getItem("usuarioLogado");
+  if (!emailUsuario) return;
+
+  const perfis = JSON.parse(localStorage.getItem("perfisUsuarios")) || {};
+  const perfil = perfis[emailUsuario];
+  if (!perfil) return;
+
+  perfil.telefone = document
+    .getElementById("telefoneProprietario")
+    .value.trim();
+  perfil.endereco = {
+    cep: document.getElementById("cep").value.trim(),
+    rua: document.getElementById("rua").value.trim(),
+    numero: document.getElementById("numero").value.trim(),
+    bairro: document.getElementById("bairro").value.trim(),
+    cidade: document.getElementById("cidade").value.trim(),
+    estado: document.getElementById("estado").value.trim(),
+  };
+
+  perfis[emailUsuario] = perfil;
+  localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
+}
+
+// ========================================================
+// Feedback visual e helpers
+// ========================================================
+
+function exibirModalConfirmacao(texto) {
+  const modal = document.querySelector(".modal-acao.modal-confirmacao");
+  const mensagem = modal.querySelector("p");
+
+  mensagem.textContent = texto;
+  modal.classList.remove("hidden");
+  modal.classList.add("show");
+
+  setTimeout(() => {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+  }, 1500);
+}
+
+function converterBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function gerarIdUnico() {
   return (
     "item_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
   );
-}
-function toggleMenu() {
-  const links = document.querySelector(".menu-links");
-  links.classList.toggle("show");
-}
-
-// ao clicar no botao Cadastrar Item, direciona para pagina de cadastro.
-function abrirCadastroNovo() {
-  sessionStorage.removeItem("itemEmEdicao");
-  window.location.href = "cadastro-item.html";
 }

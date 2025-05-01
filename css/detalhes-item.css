@@ -1,30 +1,17 @@
+/* === CONTAINER PRINCIPAL === */
 .container {
   margin: 40px auto;
+  max-width: 1200px;
+  padding: 20px;
+  position: relative; /* Necessário para posicionar o botão X corretamente */
 }
 
-.detalhes-conteudo {
-  position: relative;
-}
-.detalhes-conteudo h2 {
-  margin: 20px;
-}
-
-.fechar-modal {
-  position: absolute;
-  top: 5px;
-  right: 10px;
-  font-size: 2rem;
-  font-weight: bold;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #c0392b;
-  transition: 0.2s;
-  width: 50px;
-}
-
-.fechar-modal:hover {
-  color: #a93226;
+/* === TÍTULOS E IDENTIFICAÇÃO === */
+.container h2 {
+  margin: 20px 0 10px;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  text-align: center;
 }
 
 .nomeUsuariostrong {
@@ -40,12 +27,33 @@
   font-weight: 600;
 }
 
+/* === BOTÃO DE FECHAR PÁGINA === */
+.fechar-modal {
+  position: absolute;
+  width: 40px;
+  margin: 0;
+  top: 10px;
+  right: 30px;
+  font-size: 2rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c0392b;
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.fechar-modal:hover {
+  color: #a93226;
+}
+
+/* === GRID DE DETALHES === */
 .detalhes-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin: 20px 0;
 }
 
 .detalhes-grid .coluna {
@@ -54,20 +62,21 @@
 }
 
 .detalhes-grid .coluna p {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: #333;
-  font-size: 18px;
+  font-size: 1rem;
   line-height: 1.6;
 }
 
+/* === GALERIA DE IMAGENS === */
 .fotos-detalhe {
   display: flex;
+  flex-wrap: nowrap;
   gap: 10px;
   overflow-x: auto;
   padding: 10px 0;
-  margin-top: 10px;
-  max-width: 100%;
   scroll-snap-type: x mandatory;
+  margin-bottom: 20px;
 }
 
 .foto-detalhe {
@@ -85,6 +94,49 @@
   transform: scale(1.05);
 }
 
+/* === BOTÕES DE AÇÕES === */
+.btns-acoes {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.btn-editar,
+.btn-excluir {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-editar {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.btn-editar:hover {
+  background-color: #43a047;
+}
+
+.btn-excluir {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.btn-excluir:hover {
+  background-color: #e53935;
+}
+
+/* === BOTÃO DE FAZER OFERTA === */
+.area-botao {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
 .btn-ofertar {
   padding: 10px 16px;
   background-color: #2196f3;
@@ -93,14 +145,13 @@
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
-  display: inline-block;
-  text-align: center;
 }
 
 .btn-ofertar:hover {
   background-color: #1976d2;
 }
 
+/* === MODAL DE OFERTA === */
 .modal-oferta {
   position: fixed;
   inset: 0;
@@ -141,6 +192,7 @@
 .campo-moeda {
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .campo-moeda span {
@@ -151,8 +203,6 @@
   border-radius: 6px 0 0 6px;
   font-weight: bold;
   font-size: 14px;
-  margin-bottom: 16px;
-  margin-top: 8px;
 }
 
 .campo-moeda input {
@@ -162,49 +212,14 @@
   border: 1px solid #ccc;
   border-left: none;
   font-size: 14px;
+  margin: 0;
 }
 
-.hidden {
-  display: none !important;
+.campo-moeda.hidden {
+  display: none;
 }
 
-.confirmar-apagar {
-  background-color: #ff4d4d !important;
-  font-weight: bold;
-}
-
-.oferta-resumo {
-  margin-top: 30px;
-  margin-bottom: 20px;
-  font-size: 1.4rem;
-  background: #d1d3d4;
-  padding: 20px;
-  border-radius: 6px;
-  color: #444;
-}
-
-.oferta-resumo span {
-  font-weight: bold;
-}
-
-.fechar-detalhes {
-  width: 50px;
-  position: absolute;
-  top: -30px;
-  right: -30px;
-  font-size: 1.8rem;
-  font-weight: bold;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #c0392b;
-  transition: 0.2s;
-  z-index: 10;
-  margin-top: 0px;
-}
-.fechar-detalhes:hover {
-  color: #a93226;
-}
+/* === VISUALIZADOR DE IMAGEM AMPLIADA === */
 .visualizador-imagem {
   position: fixed;
   top: 0;
@@ -227,8 +242,6 @@
   height: auto;
   max-width: 90%;
   max-height: 90%;
-  min-width: 600px;
-  min-height: 600px;
   border-radius: 8px;
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
   object-fit: contain;
@@ -244,14 +257,22 @@
   z-index: 1002;
 }
 
-/* Estilização das ofertas recebidas */
-.oferta-recebida {
+/* === LISTAGEM DE OFERTAS RECEBIDAS === */
+.ofertas-recebidas {
+  margin-top: 40px;
+  padding: 20px;
   background-color: #f7f7f7;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.oferta-recebida {
+  background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 12px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   font-size: 0.95rem;
   line-height: 1.5;
   transition: transform 0.2s;
@@ -259,121 +280,23 @@
 
 .oferta-recebida:hover {
   transform: scale(1.02);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
-.ofertas-recebidas h3 {
-  margin-bottom: 16px;
-  color: #333;
-  font-size: 1.4rem;
-}
-
-.ofertas-recebidas p {
-  color: #666;
-}
-
-.detalhes-bloco {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.detalhes-bloco h3 {
-  margin-bottom: 16px;
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.detalhes-bloco p {
-  margin-bottom: 12px;
-  color: #555;
-  font-size: 1rem;
-}
-
-.btns-acoes {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.btn-editar,
-.btn-excluir {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn-editar {
-  background-color: #4caf50;
-  color: #fff;
-}
-
-.btn-editar:hover {
-  background-color: #43a047;
-}
-
-.btn-excluir {
-  background-color: #f44336;
-  color: #fff;
-}
-
-.btn-excluir:hover {
-  background-color: #e53935;
-}
-
-.detalhes-superior {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 30px;
-}
-
-.coluna-esquerda,
-.coluna-direita {
-  flex: 1 1 45%;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 20px 24px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.coluna-esquerda h3,
-.coluna-direita h3 {
-  margin-bottom: 16px;
-  font-size: 1.4rem;
-  color: #333;
-}
-
-.coluna-esquerda p,
-.coluna-direita p {
-  margin-bottom: 12px;
-  color: #555;
-  font-size: 1rem;
-  text-align: left;
-}
-
+/* === RESPONSIVIDADE === */
 @media (max-width: 768px) {
   .detalhes-grid {
     flex-direction: column;
   }
+
   .fotos-detalhe {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .detalhes-superior {
-    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
   }
 
-  .coluna-esquerda,
-  .coluna-direita {
-    flex: 1 1 100%;
+  .visualizador-imagem img {
+    max-width: 95%;
+    max-height: 80%;
   }
 }

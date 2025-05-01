@@ -1,51 +1,70 @@
+/* === LAYOUT PRINCIPAL === */
 .body-cadastro-usuario {
-  margin: auto;
+  margin: 0;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-}
-.container {
-  max-width: 400px;
 }
 
+/* === CONTAINER DO FORMULÁRIO === */
+.cadastro-container {
+  max-width: 400px;
+  padding: 40px;
+  background-color: #f6f2f1;
+  border-radius: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* === LOGO === */
 .logo-img {
   width: 120px;
-  margin: 0 auto;
+  margin: 0 auto 20px;
+  display: block;
 }
-.container h2 {
+
+/* === TÍTULO === */
+.cadastro-container h2 {
   font-family: "Montserrat", sans-serif;
   font-size: 2rem;
   color: #34a27b;
-  margin-bottom: 10px;
-  margin-top: 0px;
+  margin-bottom: 20px;
 }
-.container p {
+
+/* === FORMULÁRIO DE CADASTRO === */
+
+/* label */
+.form-cadastro label{
+  text-align: start;
+}
+
+/* === FAZER LOGIN === */
+.cadastro-login{
   margin-top: 15px;
 }
-.container a {
+
+/* === LINKS === */
+.cadastro-container a {
   color: #2b7a78;
   text-decoration: none;
 }
-.container a:hover{
+
+.cadastro-container a:hover {
   text-decoration: underline;
 }
+
+/* === MENSAGENS DE FEEDBACK === */
+.mensagens-feedback {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
 .mensagem {
   display: block;
-  margin-top: -5px;
   font-size: 14px;
   font-weight: bold;
-}
-
-.mensagens-feedback {
-  position: absolute;
-}
-
-.msn-cadastro{
-position: absolute;
-margin: -6px 0 0 0;
-font-size: 14px;
-font-weight: bold;
+  margin-top: 4px;
 }
 
 .mensagem.ok {
@@ -56,20 +75,16 @@ font-weight: bold;
   color: #c0392b;
 }
 
+/* === FEEDBACK VISUAL NOS INPUTS === */
 input.input-ok {
   border: 2px solid green !important;
-  outline: none;
 }
 
 input.input-erro {
   border: 2px solid red !important;
-  outline: none;
-}
-span.mensagem-login {
-  float: left;
-  margin: 10px 0 0 50px;
 }
 
-.btn{
+/* === BOTÃO CADASTRAR === */
+.btn {
   margin-top: 15px;
 }

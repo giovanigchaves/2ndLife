@@ -179,7 +179,7 @@ button {
   flex: 1;
 }
 
-/* container */
+/* === container === */
 .container {
   text-align: center;
   padding: 40px;
@@ -190,7 +190,12 @@ button {
   max-width: 1200px;
 }
 
-/* botoes */
+/* === hidden === */
+.hidden {
+  display: none;
+}
+
+/* === botoes === */
 
 .btn-vm,
 .btn-lr,
@@ -247,7 +252,7 @@ button {
   background-color: #a3433b;
 }
 
-/* foto perfil */
+/* === foto perfil === */
 .perfil-miniatura {
   display: flex;
   flex-direction: column;
@@ -280,7 +285,12 @@ button {
   display: none;
 }
 
+/* === RESPONSIVIDADE === */
 @media (max-width: 1150px) {
+  .topo-container {
+    margin: 0 20px;
+  }
+
   .topo-nav {
     display: flex;
     align-items: center;
@@ -328,9 +338,6 @@ button {
 }
 
 @media (max-width: 768px) {
-  .topo-container {
-    margin: 0 20px;
-  }
   .perfil-miniatura {
     display: none;
   }
