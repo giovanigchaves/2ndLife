@@ -286,11 +286,14 @@ async function exportarBackup() {
       await writable.write(blob);
       await writable.close();
 
-      alert("Backup exportado com sucesso!");
+      setTimeout(() => {
+        exibirModalConfirmacao("Backup exportado com sucesso!");
+      }, 300);
+
       return;
     } catch (err) {
       if (err.name !== "AbortError") {
-        alert("Erro ao exportar o backup.");
+        exibirModalConfirmacao("Erro ao exportar o backup.");
         console.error(err);
       }
       // Se o usuário cancelar, faz nada
@@ -303,9 +306,12 @@ async function exportarBackup() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "backup-2ndlife.json";
+  document.body.appendChild(a);
   a.click();
   URL.revokeObjectURL(url);
-  alert("Backup exportado com sucesso!");
+  setTimeout(() => {
+    exibirModalConfirmacao("Backup exportado com sucesso!");
+  }, 300);
 }
 
 function importarBackup(event) {
@@ -330,10 +336,11 @@ function importarBackup(event) {
         JSON.stringify(dados.perfisUsuarios || {})
       );
 
-      alert("Backup importado com sucesso!");
-      location.reload();
+      exibirModalConfirmacao("Backup importado com sucesso!", () => {
+        location.reload();
+      });
     } catch (error) {
-      alert("Erro ao importar o backup. Verifique o arquivo.");
+      exibirModalConfirmacao("Erro ao importar o backup. Verifique o arquivo.");
     }
   };
   reader.readAsText(file);
@@ -372,4 +379,25 @@ function abrirCadastroNovo() {
 function sair() {
   sessionStorage.removeItem("usuarioLogado");
   window.location.href = "login.html";
+}
+
+// =============================================
+// EXIBE MODAL COM CONFIRMAÇOES.
+// =============================================
+
+function exibirModalConfirmacao(texto, callback) {
+  const modal = document.querySelector(".modal-acao.modal-confirmacao");
+  const mensagem = modal.querySelector(".modal-acao-content p");
+
+  if (!modal || !mensagem) return;
+
+  mensagem.textContent = texto;
+  modal.classList.remove("hidden");
+  modal.classList.add("show");
+
+  setTimeout(() => {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+    if (typeof callback === "function") callback();
+  }, 1800);
 }

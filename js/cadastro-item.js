@@ -351,20 +351,17 @@ function configurarFormularioCadastro(usuario) {
     const mensagem = itemEditando
       ? "Item editado com sucesso!"
       : "Item cadastrado com sucesso!";
-    alert(mensagem);
 
     const destino = itemEditando
       ? sessionStorage.getItem("origemEdicao") || "dashboard.html"
       : "dashboard.html";
 
-    // limpar origem se for edição
-    sessionStorage.removeItem("origemEdicao");
-    sessionStorage.removeItem("itemEmEdicao");
+    // Exibe mensagem na modal e redireciona após 1.5 segundos
+    exibirModalConfirmacao(mensagem);
 
-    // redirecionar
     setTimeout(() => {
       window.location.href = destino;
-    }, 500);
+    }, 1500);
   });
 }
 
@@ -373,20 +370,37 @@ function configurarFormularioCadastro(usuario) {
 // ========================================================
 
 async function montarObjetoItem(usuario) {
-  const fotosInput = document.getElementById("fotosItem");
-  const arquivos = Array.from(fotosInput.files);
-  let fotosBase64 = [];
+  // Lista de campos obrigatórios
+  const camposObrigatorios = [
+    "nomeItem",
+    "descricaoItem",
+    "categoriaItem",
+    "quantidadeItem",
+    "duracaoOferta",
+    "telefoneProprietario",
+    "cep",
+    "rua",
+    "numero",
+    "bairro",
+    "cidade",
+    "estado",
+  ];
 
-  if (arquivos.length > 0) {
-    fotosBase64 = await Promise.all(arquivos.map(converterBase64));
-  } else {
-    // Se estiver editando e não enviou novas fotos, preserva as antigas
-    const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
-    if (itemEditando && Array.isArray(itemEditando.fotos)) {
-      fotosBase64 = itemEditando.fotos;
+  for (const id of camposObrigatorios) {
+    const campo = document.getElementById(id);
+    if (
+      !campo ||
+      campo.value.trim() === "" ||
+      campo.value === "Categoria" ||
+      campo.value === "Selecione"
+    ) {
+      exibirModalConfirmacao("Preencha todos os campos obrigatórios.");
+      campo?.focus();
+      return null;
     }
   }
 
+  // Endereço
   const endereco = {
     cep: document.getElementById("cep").value.trim(),
     rua: document.getElementById("rua").value.trim(),
@@ -396,17 +410,22 @@ async function montarObjetoItem(usuario) {
     estado: document.getElementById("estado").value.trim(),
   };
 
-  if (Object.values(endereco).some((v) => !v)) {
-    exibirModalConfirmacao("Por favor, preencha todos os campos de endereço.");
-    return null;
-  }
+  const fotosInput = document.getElementById("fotosItem");
+  const arquivos = Array.from(fotosInput.files);
+  let fotosBase64 = [];
 
   const itemEditando = JSON.parse(sessionStorage.getItem("itemEmEdicao"));
 
-  // Valida imagem apenas se for cadastro
-  if (!itemEditando && arquivos.length === 0) {
-    exibirModalConfirmacao("É necessário cadastrar pelo menos uma imagem.");
-    return null;
+  if (arquivos.length > 0) {
+    fotosBase64 = await Promise.all(arquivos.map(converterBase64));
+  } else {
+    if (!itemEditando) {
+      exibirModalConfirmacao("É necessário cadastrar pelo menos uma imagem.");
+      fotosInput.focus();
+      return null;
+    } else {
+      fotosBase64 = itemEditando.fotos || [];
+    }
   }
 
   return {
@@ -526,7 +545,7 @@ function exibirModalConfirmacao(texto) {
   setTimeout(() => {
     modal.classList.remove("show");
     modal.classList.add("hidden");
-  }, 1500);
+  }, 2000);
 }
 
 function converterBase64(file) {

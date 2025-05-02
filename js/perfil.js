@@ -95,8 +95,9 @@ document.getElementById("formPerfil").addEventListener("submit", function (e) {
   };
 
   localStorage.setItem("perfisUsuarios", JSON.stringify(perfis));
-  alert("Perfil atualizado com sucesso!");
-  window.location.reload();
+  exibirModalConfirmacao("Perfil atualizado com sucesso!", () => {
+    window.location.reload();
+  });
 });
 
 // =============================================
@@ -116,4 +117,23 @@ function abrirCadastroNovo() {
 function sair() {
   sessionStorage.removeItem("usuarioLogado");
   window.location.href = "login.html";
+}
+
+// =============================================
+// FUNÇÃO QUE EXIBE A MODAL
+// =============================================
+
+function exibirModalConfirmacao(texto, callback) {
+  const modal = document.querySelector(".modal-acao.modal-confirmacao");
+  const mensagem = modal.querySelector("p");
+
+  mensagem.textContent = texto;
+  modal.classList.remove("hidden");
+  modal.classList.add("show");
+
+  setTimeout(() => {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+    if (typeof callback === "function") callback();
+  }, 1500);
 }

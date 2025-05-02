@@ -77,7 +77,7 @@
       <select id="tipoOferta">
         <option value="">Selecione</option>
         <option value="pagarei">Tenho interesse e pagarei</option>
-        <option value="retirarGratis">Tenho interesse e retiro gratuitamente</option>
+        <option value="gratis">Tenho interesse e retiro gratuitamente</option>
         <option value="cobro">Dou destino adequado, mas cobro</option>
       </select>
 
@@ -102,6 +102,14 @@
     <span class="fechar-visualizador" onclick="fecharVisualizadorImagem()">×</span>
     <img id="imagemAmpliada" src="" alt="Imagem ampliada do item" />
   </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal-acao modal-confirmacao hidden" role="alertdialog" aria-hidden="true">
+    <div class="modal-acao-content">
+      <p>Mensagem de confirmação...</p>
+    </div>
+  </div>
+
 
   <!-- Script -->
   <script src="js/detalhes-item.js"></script>

@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="css/itens-cadastrados.css" />
 
   <!-- Fontes Google -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&family=Poppins&display=swap"
+    rel="stylesheet">
 </head>
 
 <body class="body-itens">
@@ -27,7 +28,7 @@
           <a href="dashboard.html">Dashboard</a>
           <a href="#" onclick="abrirCadastroNovo()">Cadastrar Item</a>
           <a class="ativo" href="itens-cadastrados.html">Itens Cadastrados</a>
-          
+
           <!-- Links de backup visíveis apenas em telas menores -->
           <a href="#" id="linkExportarBackup" class="link-backup hidden">Exportar Backup</a>
           <a href="#" id="linkImportarBackup" class="link-backup hidden">Importar Backup</a>
@@ -101,10 +102,10 @@
       </div>
     </div>
 
-    <!-- Modal de feedback para ações como cadastrar, editar ou excluir -->
+    <!-- Modal de feedback para ações como cadastrar, editar, excluir e mensagens -->
     <div class="modal-acao modal-confirmacao hidden">
       <div class="modal-acao-content">
-        <p>Item excluído com sucesso!</p>
+        <p></p>
       </div>
     </div>
 
@@ -135,9 +136,9 @@
           </div>
 
           <label for="mensagemOferta">Mensagem (opcional):</label>
-          <textarea id="mensagemOferta" rows="4" style="width: 100%;"></textarea>
+          <textarea id="mensagemOferta" rows="4"></textarea>
 
-          <button type="submit" class="btn-fazer-oferta" style="margin-top: 15px;">Enviar Oferta</button>
+          <button type="submit" class="btn-fazer-oferta">Enviar Oferta</button>
         </form>
       </div>
     </div>

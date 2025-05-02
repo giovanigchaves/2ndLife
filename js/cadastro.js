@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function validarSenhas() {
   const senha = document.getElementById("senhaCadastro")?.value;
   const confirmacao = document.getElementById("senhaConfirmacao")?.value;
-  const mensagem = document.getElementById("mensagemSenha");
+  const mensagem = document.getElementById("mensagemCadastro");
   const campoConfirmacao = document.getElementById("senhaConfirmacao");
 
   if (!senha || !confirmacao || !mensagem || !campoConfirmacao) return;
@@ -39,6 +39,8 @@ function validarSenhas() {
     campoConfirmacao.classList.add("input-ok");
     campoConfirmacao.classList.remove("input-erro");
     mensagem.textContent = "";
+    mensagem.classList.remove("erro");
+    mensagem.classList.remove("ok");
   } else {
     campoConfirmacao.classList.add("input-erro");
     campoConfirmacao.classList.remove("input-ok");
@@ -65,7 +67,7 @@ function cadastrarUsuario() {
   }
 
   if (senha !== confirmacao) {
-    exibirMensagem("As senhas não coincidem.", false);
+    exibirMensagem("As senhas não coincidem!", false);
     return;
   }
 

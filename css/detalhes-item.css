@@ -238,13 +238,12 @@
 }
 
 .visualizador-imagem img {
-  width: auto;
+  width: 70vw;
   height: auto;
-  max-width: 90%;
-  max-height: 90%;
+  min-height: 70vh;
+  object-fit: contain;
   border-radius: 8px;
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
-  object-fit: contain;
 }
 
 .fechar-visualizador {
@@ -283,6 +282,49 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
+/* === MODAL DE CONFIRMAÇÃO (Feedback Visual) === */
+.modal-acao {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-acao.hidden {
+  display: none;
+}
+
+.modal-acao.show {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.modal-acao-content {
+  background-color: #fff;
+  padding: 60px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  max-width: 800px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* === RESPONSIVIDADE === */
 @media (max-width: 768px) {
   .detalhes-grid {
@@ -296,7 +338,7 @@
   }
 
   .visualizador-imagem img {
-    max-width: 95%;
-    max-height: 80%;
+    width: 90vw;
+    max-height: 75vh;
   }
 }

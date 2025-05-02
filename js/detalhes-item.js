@@ -299,10 +299,18 @@ function configurarEnvioOferta(item) {
       .getElementById("telefoneOferta")
       .value.trim();
 
-    if (!tipo) return alert("Selecione o tipo de oferta.");
-    if ((tipo === "pagarei" || tipo === "cobro") && !valorInput)
-      return alert("Informe o valor.");
-    if (!telefoneOferta) return alert("Informe seu telefone para contato.");
+    if (!tipo) {
+      exibirModalConfirmacao("Selecione o tipo de oferta.");
+      return;
+    }
+    if ((tipo === "pagarei" || tipo === "cobro") && !valorInput) {
+      exibirModalConfirmacao("Informe o valor.");
+      return;
+    }
+    if (!telefoneOferta) {
+      exibirModalConfirmacao("Informe seu telefone para contato.");
+      return;
+    }
 
     const valor = tipo === "gratis" ? 0 : parseFloat(valorInput);
 
@@ -367,11 +375,15 @@ function configurarEnvioOferta(item) {
       }
       localStorage.setItem("ofertas", JSON.stringify(ofertasExistentes));
 
-      alert("Oferta enviada com sucesso e registrada como melhor oferta!");
+      exibirModalConfirmacao(
+        "Oferta enviada com sucesso e registrada como melhor oferta!"
+      );
       document.getElementById("modalOferta").classList.add("hidden");
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 2000);
     } else {
-      alert("Sua oferta não é melhor do que a atual e não foi registrada.");
+      exibirModalConfirmacao(
+        "Sua oferta não é melhor do que a atual e não foi registrada."
+      );
     }
   };
 }
@@ -440,4 +452,22 @@ function renderizarOferta(oferta, container) {
 
   div.innerHTML = texto;
   container.appendChild(div);
+}
+
+// =============================================
+// EXIBE A MODAL DE CONFIRMAÇÃO E ALERTAS.
+// =============================================
+
+function exibirModalConfirmacao(texto) {
+  const modal = document.querySelector(".modal-acao.modal-confirmacao");
+  const mensagem = modal.querySelector("p");
+
+  mensagem.textContent = texto;
+  modal.classList.remove("hidden");
+  modal.classList.add("show");
+
+  setTimeout(() => {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+  }, 2000);
 }
